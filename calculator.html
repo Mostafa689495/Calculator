@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MHD_VOICE_CALCULATOR</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Cairo', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(270deg, #ff3e3e, #3e92ff, #ff9e3e, #00BCD4);
+            background-size: 800% 800%;
+            animation: gradientAnimation 10s ease infinite;
+        }
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .content {
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            text-align: center;
+            padding: 5vw;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            animation: floatAnimation 4s ease-in-out infinite, zoomIn 1s ease-out;
+            position: relative;
+        }
+        @keyframes floatAnimation {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        @keyframes zoomIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        h1 {
+            font-size: 6vw; /* حجم نص متغير */
+            margin-bottom: 5vw;
+            animation: textColorChange 5s linear infinite;
+        }
+        @keyframes textColorChange {
+            0% { color: #ff006e; }
+            25% { color: #3e92ff; }
+            50% { color: #ff9e3e; }
+            75% { color: #00BCD4; }
+            100% { color: #ff006e; }
+        }
+        h3 {
+            font-size: 4vw; /* حجم نص متغير */
+            margin-bottom: 5vw;
+            color: #3e92ff;
+        }
+        .button {
+            display: block;
+            width: 100%; /* جعل الأزرار مناسبة للشاشة */
+            padding: 5vw 0; /* استخدام وحدات نسبية */
+            margin: 5vw 0;
+            font-size: 4vw; /* حجم نص متغير */
+            font-size: 1.2em;
+            color: #fff;
+            background-color: #FF6F61;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+        }
+        .button:hover {
+            box-shadow: 0 0 20px #FF6F61;
+            transform: scale(1.05);
+            background-color: #00BCD4;
+        }
+        .result-box {
+            display: flex;
+            justify-content: space-around;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .result-box div {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            width: 100%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            font-size: 1.2em;
+            overflow-wrap: break-word;
+        }
+        .result-box div:first-child {
+            border: 2px solid #FF6F61;
+        }
+        .result-box div:last-child {
+            border: 2px solid #3e92ff;
+        }
+        .arabic {
+            direction: rtl;
+        }
+        #status-message {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 15px;
+            font-size: 1.2em;
+            background: rgba(0, 0, 0, 0.9);
+            color: #fff;
+            border-bottom: 2px solid #FF6F61;
+            z-index: 10;
+            opacity: 0; /* Start hidden */
+            transition: opacity 0.5s ease;
+        }
+        .status-show {
+            opacity: 1; /* Show the message */
+        }
+        h4 {
+            font-size: 1.2em;
+            margin-top: 20px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <div id="status-message"></div>
+        <h1>MHD_VOICE_CALCULATOR</h1>
+        <h3 id="language-heading">Language: </h3>
+        <button id="record-button" class="button" onclick="startRecording()">Start Recording</button>
+        <div class="result-box">
+            <div id="spoken-text">You said:</div>
+            <div id="result">Result:</div>
+        </div>
+        <h4 id="MOSTAFA">This project by Mostafa Hazem</h4>
+    </div>
+
+    <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+        const urlParams = new URLSearchParams(window.location.search);
+        const language = urlParams.get('lang');
+
+        if (language === 'ar-EG') {
+            document.body.classList.add('arabic');
+            document.getElementById('language-heading').innerText = 'اللغة: العربية';
+            document.getElementById('record-button').innerText = 'ابدأ التسجيل';
+            document.getElementById('spoken-text').innerText = 'قلت:';
+            document.getElementById('result').innerText = 'الناتج:';
+            document.getElementById('MOSTAFA').innerText = 'هذا المشروع بواسطة "عبدالرحمن حازم"';
+        } else {
+            document.body.classList.remove('arabic');
+            document.getElementById('language-heading').innerText = 'Language: English';
+            document.getElementById('record-button').innerText = 'Start Recording';
+            document.getElementById('MOSTAFA').innerText = 'THIS PROJECT BY "ABD ULRAHMAN HAZEM"';
+        }
+
+        function startRecording() {
+            if (!('webkitSpeechRecognition' in window)) {
+                document.getElementById('status-message').innerText = 'Speech recognition not supported';
+                return;
+            }
+
+            const recognition = new webkitSpeechRecognition();
+            recognition.lang = language;
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            recognition.onstart = () => {
+                document.getElementById('status-message').innerText = language === 'ar-EG' ? 'تم التسجيل، جاري المعالجة...' : 'Recording complete, processing...';
+                document.getElementById('status-message').classList.add('status-show');
+            };
+
+            recognition.onspeechend = () => {
+                recognition.stop();
+            };
+
+            recognition.onerror = (event) => {
+                document.getElementById('status-message').innerText = 'Error occurred: ' + event.error;
+            };
+
+            recognition.onresult = (event) => {
+
+                let transcript = event.results[0][0].transcript;
+                document.getElementById('spoken-text').innerText = `${language === 'ar-EG' ? 'قلت:' : 'You said:'} ${transcript}`;
+                let expression = convertToExpression(transcript);
+                let result = calculateExpression(expression);
+                document.getElementById('result').innerText = `${language === 'ar-EG' ? 'الناتج:' : 'Result:'} ${result}`;
+                document.getElementById('status-message').innerText = '';
+
+                // تشغيل الصوت
+                let textToSpeak = `${language === 'ar-EG' ? '' : ''} ${result}`;
+                let utterance = new SpeechSynthesisUtterance(textToSpeak);
+                utterance.lang = language === 'ar-EG' ? 'ar-EG' : 'en-US';
+                utterance.pitch = 1; // ضبط درجة الصوت
+                utterance.rate = 1; // ضبط سرعة الصوت
+                window.speechSynthesis.speak(utterance);
+   
+                
+
+                // إظهار الرسالة أسفل النص "هذا المشروع بواسطة مصطفي حازم" ثم اختفائها بعد 5 ثواني
+                setTimeout(() => {
+                    document.getElementById('status-message').classList.remove('status-show');
+                }, 5000);
+            };
+
+
+            recognition.start();
+        }
+
+        function convertToExpression(text) {
+            let expression = text;
+            if (language === 'ar-EG') {
+                expression = expression.replace(/ضرب|في|x|X|×|✖/g, '*')
+                                       .replace(/جمع|زائد/g, '+')
+                                       .replace(/طرح|ناقص/g, '-')
+                                       .replace(/قسمة|على/g, '/')
+                                       .replace(/واحد/g, '1')
+                                       .replace(/اثنين|اتنين/g, '2')
+                                       .replace(/ثلاثة/g, '3')
+                                       .replace(/اربعة|أربعة/g, '4')
+                                       .replace(/خمسة/g, '5')
+                                       .replace(/ستة/g, '6')
+                                       .replace(/سبعة/g, '7')
+                                       .replace(/ثمانية/g, '8')
+                                       .replace(/تسعة/g, '9')
+                                       .replace(/صفر/g, '0')
+                                       .replace(/،/g, '');
+            } else {
+                expression = expression.replace(/times|x|X|×|✖/g, '*')
+                                       .replace(/plus/g, '+')
+                                       .replace(/minus/g, '-')
+                                       .replace(/divided|over|division/g, '/')
+                                       .replace(/squared|square/g, '**2')
+                                       .replace(/cubed|cube/g, '**3')
+                                       .replace(/power|base/g, '**')
+                                       .replace(/one/g, '1')
+                                       .replace(/two/g, '2')
+                                       .replace(/three/g, '3')
+                                       .replace(/four/g, '4')
+                                       .replace(/five/g, '5')
+                                       .replace(/six/g, '6')
+                                       .replace(/seven/g, '7')
+                                       .replace(/eight/g, '8')
+                                       .replace(/nine/g, '9')
+                                       .replace(/zero/g, '0')
+                                       .replace(/،/g, '') ;
+            }
+            return expression;
+        }
+
+
+
+        function calculateExpression(expression) {
+            try {
+                return eval(expression);
+            } catch (e) {
+                return language === 'ar-EG' ? 'لا أفهم' : 'I don\'t understand';
+            }
+        }
+    </script>
+</body>
+</html>
