@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MHD_VOICE_CALCULATOR</title>
+    <style>
+        /* تنسيق الخلفية */
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Cairo', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(270deg, #ff3e3e, #3e92ff, #ff9e3e, #00BCD4);
+            background-size: 800% 800%;
+            animation: gradientAnimation 10s ease infinite;
+        }
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* تنسيق النص العريض المتحرك */
+        .zoom-text {
+            font-size: 5vw; /* حجم نص عريض متغير */
+            font-weight: bold;
+            color: #fff;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: zoomIn 2s ease-out forwards, fadeOut 1s ease 2s forwards;
+        }
+        @keyframes zoomIn {
+            from { transform: translate(-50%, -50%) scale(1); }
+            to { transform: translate(-50%, -50%) scale(3); }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity:  0; }
+        }
+
+        /* تنسيق المحتوى الرئيسي */
+        .content {
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            text-align: center;
+            padding: 5vw; /* استخدام وحدات نسبية */
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 2s ease-out forwards, moveUpDown 3s ease-in-out infinite;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            display: none; /* إخفاء المحتوى الرئيسي في البداية */
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        /* حركة لأعلى ولأسفل */
+        @keyframes moveUpDown {
+            0%, 100% { transform: translate(-50%, -50%); }
+            50% { transform: translate(-50%, calc(-50% - 10px)); }
+        }
+
+        h1 {
+            font-size: 6vw; /* حجم نص متغير */
+            margin-bottom: 5vw;
+            animation: textColorChange 5s linear infinite;
+        }
+        @keyframes textColorChange {
+            0% { color: #ff006e; }
+            25% { color: #3e92ff; }
+            50% { color: #ff9e3e; }
+            75% { color: #00BCD4; }
+            100% { color: #ff006e; }
+        }
+        h3 {
+            font-size: 4vw; /* حجم نص متغير */
+            margin-bottom: 5vw;
+            color: #3e92ff;
+        }
+        .button {
+            display: block;
+            width: 90%; /* جعل الأزرار مناسبة للشاشة */
+            padding: 5vw 0; /* استخدام وحدات نسبية */
+            margin: 5vw 0;
+            font-size: 4vw; /* حجم نص متغير */
+            color: #fff;
+            background-color: #FF6F61;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+        }
+        .button:hover {
+            box-shadow: 0 0 20px #FF6F61;
+            transform: scale(1.05);
+            background-color: #00BCD4;
+        }
+    </style>
+</head>
+<body>
+    <div class="zoom-text">Hello!</div>
+    <div class="content">
+        <h1>MHD_VOICE_CALCULATOR</h1>
+        <h3>اختر اللغة / Choose Language</h3>
+        <button class="button" onclick="window.location.href='calculator.html?lang=ar-EG'">العربية</button>
+        <button class="button" onclick="window.location.href='calculator.html?lang=en-US'">English</button>
+        <h4>THIS PROJECT BY "ABD ULRAHMAN HAZEM"</h4>
+    </div>
+
+    <script>
+        window.addEventListener('load', () => {
+            const zoomText = document.querySelector('.zoom-text');
+            const content = document.querySelector('.content');
+
+            // تأخير عرض المحتوى الرئيسي بعد انتهاء تأثير الزووم
+            setTimeout(() => {
+                zoomText.style.display = 'none'; // إخفاء النص العريض المتحرك
+                content.style.display = 'block'; // عرض المحتوى الرئيسي
+                content.style.opacity = 1; // تفعيل ظهور المحتوى
+            }, 2500); 
+        });
+    </script>
+</body>
+</html>
