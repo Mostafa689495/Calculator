@@ -782,7 +782,7 @@
             }
         }
 
-        /* ��حسينات إضافية للتجربة على الموبايل */
+        /* حسينات إضافية للتجربة على الموبايل */
         @media (hover: none) {
             /* تحسين التفاعل باللمس */
             .main-btn:active,
@@ -818,7 +818,7 @@
             }
         }
 
-        /* تحسينات عامة للتفاعل */
+        /* تحسي��ات عامة للتفا��ل */
         * {
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
@@ -1025,6 +1025,7 @@
 
         .step-full-operation {
             color: var(--text-color);
+            background: var(--card-bg);
             opacity: 0.8;
             font-size: 0.9rem;
             margin-top: 0.5rem;
@@ -1469,7 +1470,7 @@
             opacity: 0;
         }
 
-        /* تحسينات للموبايل */
+        /* تحسينات للموبال */
         @media (max-width: 768px) {
             .modern-container {
                 padding: 2rem 1.5rem;
@@ -1594,7 +1595,7 @@
             max-width: 800px;
         }
 
-        /* تحسين المحاذاة للموبايل */
+        /* تحسين المحااة للموبايل */
         @media (max-width: 768px) {
             .step-explanation {
                 padding: 2rem;
@@ -1868,7 +1869,7 @@
             const themeButton = document.getElementById('themeToggle');
             const body = document.body;
             
-            // تأثير حر��ي للزر
+            // تأثير حري للزر
             themeButton.style.transform = 'scale(0.8)';
             
             // تغيير الوضع مع تأثير انتقالي
@@ -1940,7 +1941,8 @@
             const savedHistory = localStorage.getItem('calculatorHistory');
             if (savedHistory) {
                 const history = JSON.parse(savedHistory);
-                history.forEach(item => {
+                // عكس ترتيب المصفوفة قبل إضافة العناصر
+                history.reverse().forEach(item => {
                     addToHistory(item.operation, item.result, false);
                 });
             }
@@ -1968,7 +1970,7 @@
                 </div>
             `;
 
-            // إضافة في بداية السجل
+            // إضافة العنصر الجديد في بداية القائمة
             if (historyContainer.firstChild) {
                 historyContainer.insertBefore(historyItem, historyContainer.firstChild);
             } else {
@@ -2415,9 +2417,10 @@
                                 <div class="step-content calculation">
                                     <div class="step-explanation">${step.explanation}</div>
                                     <div class="step-operation">${formatNumber(step.result)}</div>
-                                    ${step.fullOperation ? 
-                                        `<div class="step-full-operation">العملية الآن: ${step.fullOperation}</div>` : 
-                                        ''}
+                                    <div class="step-full-operation" style="background: var(--card-bg); color: var(--text-color); font-size: 1.4rem; padding: 1rem; border-radius: 8px;">
+                                        <div>:العملية الآن</div>
+                                        <div>${step.fullOperation}</div>
+                                    </div>
                                 </div>
                             `;
                             break;
