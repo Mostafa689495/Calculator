@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html dir="rtl">
+<head>
+    <link rel="icon" type="image/x-icon" href="https://www2.0zz0.com/2024/11/17/11/646664920.png">
+    <title>الأعراض الجانبية للتطعيم</title>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #3b82f6;
+            --accent-color: #f43f5e;
+            --success-color: #22c55e;
+            --background-color: #f1f5f9;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --gradient-primary: linear-gradient(135deg, #2563eb, #3b82f6);
+            --gradient-hover: linear-gradient(135deg, #1d4ed8, #2563eb);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--background-color);
+            min-height: 100vh;
+            padding: 20px;
+            background-image: 
+                radial-gradient(at 40% 20%, rgba(37, 99, 235, 0.1) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, rgba(37, 99, 235, 0.1) 0px, transparent 50%);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
+            backdrop-filter: blur(10px);
+            transform: translateY(0);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .container h2 {
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(37, 99, 235, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5em;
+        }
+
+
+
+        .vaccine-card {
+            padding: 25px;
+            margin: 20px 0;
+            border: none;
+            border-radius: 20px;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vaccine-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 4px;
+        }
+
+        .vaccine-card:hover {
+            transform: translateY(-5px) scale(1.01);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .vaccine-info {
+            margin-bottom: 15px;
+        }
+
+        .vaccine-name {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .vaccine-details {
+            color: #666;
+            font-size: 0.9em;
+            display: flex;
+            gap: 15px;
+        }
+
+        .doctor-info {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #eee;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .side-effect-item {
+            padding: 20px;
+            margin: 15px 0;
+            background: white;
+            border-radius: 16px;
+            border: 1px solid rgba(37, 99, 235, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .side-effect-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--gradient-primary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .side-effect-item:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 8px 12px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .side-effect-item:hover::before {
+            opacity: 1;
+        }
+
+        .side-effect-item label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .side-effect-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--secondary-color);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn.primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn.primary:hover {
+            background: var(--gradient-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px -2px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn i {
+            font-size: 1.1em;
+        }
+
+        .secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-content h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border: 2px solid rgba(37, 99, 235, 0.1);
+            border-radius: 12px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: rgba(37, 99, 235, 0.02);
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+            background: white;
+        }
+
+        /* تصميم الإشعارات */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(120%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            border-right: 4px solid var(--success-color);
+        }
+
+        .notification.error {
+            border-right: 4px solid var(--accent-color);
+        }
+
+        .notification i {
+            font-size: 1.2em;
+        }
+
+        .notification.success i {
+            color: var(--success-color);
+        }
+
+        .notification.error i {
+            color: var(--accent-color);
+        }
+
+        .symptoms-container {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .common-symptoms, .reported-symptoms {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .common-symptoms h3, .reported-symptoms h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .common-symptoms h4{
+            color: var(--primary-color);
+        }
+
+        .symptoms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .symptom-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-radius: 12px;
+            background: rgba(37, 99, 235, 0.02);
+            transition: all 0.3s ease;
+        }
+
+        .symptom-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .symptom-card.خفيف {
+            border-right: 4px solid var(--success-color);
+        }
+
+        .symptom-card.متوسط {
+            border-right: 4px solid #f59e0b;
+        }
+
+        .symptom-card.شديد {
+            border-right: 4px solid var(--accent-color);
+        }
+
+        .symptom-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(37, 99, 235, 0.1);
+        }
+
+        .symptom-icon i {
+            font-size: 1.2em;
+            color: var(--primary-color);
+        }
+
+        .symptom-details {
+            flex: 1;
+        }
+
+        .symptom-name {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .severity-badge {
+            font-size: 0.8em;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary-color);
+        }
+
+        .خفيف .severity-badge {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--success-color);
+        }
+
+        .متوسط .severity-badge {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+
+        .شديد .severity-badge {
+            background: rgba(244, 63, 94, 0.1);
+            color: var(--accent-color);
+        }
+
+        /* إضافة نمط النافذة الجانبية */
+        .side-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 400px;
+            height: 100vh;
+            background: white;
+            box-shadow: 5px 0 25px rgba(0, 0, 0, 0.1);
+            transform: translateX(-100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+            direction: rtl;
+        }
+
+        .side-panel.active {
+            transform: translateX(0);
+        }
+
+        /* تعديل تصميم العناوين في النافذة الجانبية */
+        .side-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(37, 99, 235, 0.1);
+        }
+
+        .side-panel-header h3 {
+            color: var(--primary-color);
+            font-size: 1.2em;
+            margin: 0;
+        }
+
+        .close-panel {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .close-panel:hover {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary-color);
+        }
+
+        /* تعديل تصميم البطاقات داخل النافذة */
+        .side-panel .symptom-card {
+            margin-bottom: 12px;
+            border: 1px solid rgba(37, 99, 235, 0.1);
+        }
+
+        /* إضافة خلفية معتمة عند فتح النافذة */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(3px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* تحسين تصميم النافذة المنبثقة للأعراض */
+        .symptoms-dialog {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.1);
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .symptoms-dialog.active {
+            transform: translateY(0);
+        }
+
+        .symptoms-question {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            color: #2c3e50;
+        }
+
+        .symptoms-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .symptom-btn {
+            padding: 12px 25px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .symptom-btn.yes {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .symptom-btn.no {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        /* إضافة أنماط جدة */
+        .other-symptom {
+            border: 2px dashed rgba(37, 99, 235, 0.3);
+            background: rgba(37, 99, 235, 0.02);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .other-symptom:hover {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .other-symptom .symptom-icon {
+            background: rgba(37, 99, 235, 0.1);
+        }
+
+        .custom-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(37, 99, 235, 0.2);
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .custom-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            outline: none;
+        }
+
+        /* إضافة نمط مؤشر التحميل */
+        .loader-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding: 30px;
+        }
+
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--background-color);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loader-text {
+            color: var(--primary-color);
+            font-size: 1.1em;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .reported-symptoms {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid rgba(37, 99, 235, 0.1);
+        }
+
+        .reported-symptoms h4 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .symptom-description {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .other-symptom {
+            margin-top: 20px;
+        }
+
+        .user-symptoms {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .user-symptoms h4 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-symptoms .symptoms-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .user-symptoms .symptom-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-radius: 12px;
+            background: rgba(37, 99, 235, 0.02);
+            transition: all 0.3s ease;
+        }
+
+        .user-symptoms .symptom-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-symptoms .symptom-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(37, 99, 235, 0.1);
+        }
+
+        .user-symptoms .symptom-icon i {
+            font-size: 1.2em;
+            color: var(--primary-color);
+        }
+
+        .user-symptoms .symptom-details {
+            flex: 1;
+        }
+
+        .user-symptoms .symptom-name {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        /* نمط زر الرجوع */
+        .btn.primary i.fa-arrow-right {
+            margin-left: 8px;
+        }
+        
+        /* تحسين موقع الزر */
+        body {
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- إضافة زر الرجوع في بداية الصفحة -->
+    
+
+    <!-- قائمة التطعيمات المأخوذة -->
+    <div class="container">
+        <h2 style="display: flex; justify-content: space-between; align-items: center;">
+            <span>التطعيمات المأخوذة</span>
+            <button onclick="window.history.back()" class="btn primary" style="margin: 0;">
+                <i class="fas fa-arrow-right"></i>
+                رجوع
+            </button>
+        </h2>
+        <div id="vaccinesList"></div>
+    </div>
+
+    <!-- قسم الأعراض الجانبية -->
+    <div class="container" id="sideEffectsSection" style="display: none;">
+        <h2><i class="fas fa-notes-medical"></i> الأعراض الجانبية الشائعة</h2>
+        <div id="commonSideEffects"></div>
+        
+        <button id="reportNewSymptom" class="btn primary">
+            <i class="fas fa-plus-circle"></i>
+            إبلاغ عن عرض جديد
+        </button>
+    </div>
+
+    <!-- نموذج إضافة عرض جديد -->
+    <div id="newSymptomModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3>إبلاغ عن عرض جديد</h3>
+            <form id="newSymptomForm">
+                <input type="text" id="symptomName" placeholder="اسم العرض" required>
+                <textarea id="symptomDescription" placeholder="وصف العرض (اختياري)"></textarea>
+                <button type="submit" class="btn primary">إرسال</button>
+                <button type="button" class="btn secondary" onclick="closeModal()">إلغاء</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+        // تهيئة Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYMRiJQs8vsapzX1bMHTWjrEb-N2ePIPo",
+            authDomain: "mhd-vaxtracker.firebaseapp.com",
+            databaseURL: "https://mhd-vaxtracker-default-rtdb.firebaseio.com",
+            projectId: "mhd-vaxtracker",
+            storageBucket: "mhd-vaxtracker.firebasestorage.app",
+            messagingSenderId: "104907445114",
+            appId: "1:104907445114:web:6110c5cf4e2607ed677cc3",
+            measurementId: "G-RF9SYJ2KCH"
+        };
+        
+        // تهيئة Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        // تحميل التطعيمات المأخوذة
+        async function loadCompletedVaccines() {
+            const vaccinesList = document.getElementById('vaccinesList');
+            
+            // إظهار مؤشر التحميل
+            vaccinesList.innerHTML = `
+                <div class="loader-container">
+                    <div class="loader"></div>
+                    <div class="loader-text">جاري تحميل التطعيمات...</div>
+                </div>
+            `;
+
+            const nationalId = localStorage.getItem('nationalId');
+            
+            if (!nationalId) {
+                console.error('لم يتم العثور عل معرف المستخدم');
+                showNotification('الرجاء تسجيل الدخول أولاً', 'error');
+                vaccinesList.innerHTML = '<p>الرجاء تسجيل الدخول لعرض التطعيمات</p>';
+                return;
+            }
+
+            try {
+                console.log('جاري تحميل التطعيمات للمستخدم:', nationalId);
+                
+                const snapshot = await firebase.database()
+                    .ref(`users/${nationalId}/vaccines`)
+                    .once('value');
+                
+                const vaccines = snapshot.val();
+                vaccinesList.innerHTML = '';
+
+                if (!vaccines) {
+                    console.log('لا توجد تطعيمات مكتملة');
+                    vaccinesList.innerHTML = '<p>لا توجد تطعيمات مكتملة حتى الآن</p>';
+                    return;
+                }
+
+                console.log('التعيمات المتوفرة:', vaccines);
+
+                for (const [vaccineId, data] of Object.entries(vaccines)) {
+                    if (data.date) {
+                        const vaccineCard = createVaccineCard(vaccineId, data);
+                        vaccinesList.appendChild(vaccineCard);
+                    }
+                }
+            } catch (error) {
+                console.error('تفاصيل الطأ:', error);
+                vaccinesList.innerHTML = '<p>حدث خطأ في تحميل التطعيمات</p>';
+                showNotification('حدث خطأ في تحميل التطعيمات: ' + error.message, 'error');
+            }
+        }
+
+        // تحويل التاريخ من timestamp إلى تاريخ
+        function createVaccineCard(vaccineId, data) {
+            const card = document.createElement('div');
+            card.className = 'vaccine-card';
+            
+            const vaccineDate = new Date(parseInt(data.date));
+            
+            card.innerHTML = `
+                <div class="vaccine-info">
+                    <div class="vaccine-name">
+                        <i class="fas fa-shield-virus"></i>
+                        ${getVaccineName(vaccineId)}
+                    </div>
+                    <div class="vaccine-details">
+                        <span>
+                            <i class="far fa-calendar-alt"></i>
+                            ${vaccineDate.toLocaleDateString('ar-EG')}
+                        </span>
+                    </div>
+                    ${data.doctor ? `
+                        <div class="doctor-info">
+                            <i class="fas fa-user-md"></i>
+                            ${data.doctor.name || 'غير محدد'}
+                        </div>
+                    ` : ''}
+                </div>
+                <button onclick="showSideEffects('${vaccineId}')" class="btn primary">
+                    <i class="fas fa-list-ul"></i>
+                    عرض الأعراض الجانبية
+                </button>
+            `;
+            return card;
+        }
+
+        // تحديث دالة getVaccineName
+        function getVaccineName(vaccineId) {
+            const vaccineNames = {
+                'bcg1': "التطعيم ضد الدرن (BCG)",
+                'hepb1': "التطعيم ضد التهاب الكبد الوبائي ب (الجرعة الأولى)",
+                'dtp1': "التطعيم ضد الدفتيريا والتيتانوس والسعال الديكي (الجرعة الأولى)",
+                'polio1': "التطعيم ضد شلل الأطفال (الجرعة الأولى)",
+                'hib1': "التطعيم ضد المستدمية النزلية (الجرعة الأولى)",
+                'hepb2': "التطعيم ضد التهاب الكبد الوبائي (الجرعة الثانية)",
+                'pcv1': "التطعيم ضد الالتهاب ارئوي (الجرعة الأولى)",
+                'rota1': "التطعيم ضد فيروس لروتا (الجرعة الأولى)",
+                'dtp2': "التطعيم ضد الدفتيريا واتيتانوس والسعال الديكي (الجرعة الثانية)",
+                'polio2': "التطعيم ضد شلل الأطفال (الجرعة الثانية)",
+                'hib2': "التطعيم ضد المستدمية النزلية (الجرعة الثانية)",
+                'pcv2': "التطعيم ضد الالتهاب الرئوي (الجرعة الثانية)",
+                'rota2': "التطعيم ضد فيروس الروتا (الجرعة الثانية)",
+                'dtp3': "التطعيم ضد الدفتيريا والتيتانوس والسعال الديكي (الجرعة الثالثة)",
+                'polio3': "التطعيم ضد شلل الأطفال (الجرعة الثالثة)",
+                'hib3': "التطعيم ضد المستدمية النزلية (الجرعة الثالثة)",
+                'pcv3': "التطعيم ضد الالتهاب الرئوي (الجرعة الثالثة)",
+                'rota3': "التطعيم ضد فيروس الروتا (الجرعة الثالثة)",
+                'mmr1': "التطعيم ضد الحصبة والنكاف والحصبة لألمانية (الجرعة الأولى)",
+                'var1': "التطعيم ضد الجدري المائي (الجرعة الألى)",
+                'hepa1': "التطعيم ضد التهاب الكبد A (الجرعة الأولى)",
+                'flu1': "التطعيم ضد الأنفلونزا",
+                'mmr2': "التطعيم ضد الحصبة والنكاف والحصبة الألمانية (الجرعة الثانية)",
+                'dtp4': "التطعيم ضد الدفتيريا والتيتانوس والسعال الديكي (جرعة تعزيزية)",
+                'polio4': "التطعيم ضد شلل الأطفال (جرعة تعزيزية)",
+                'flu2': "التطعيم ضد الأنفلونزا (إذا كان موسمياً)",
+                'hepa2': "التطعيم ضد التهاب الكبد A (الجرعة الثانية)"
+            };
+            return vaccineNames[vaccineId] || vaccineId;
+        }
+
+        // عر الأعراض الجانبية للتطعيم المحدد
+        async function showSideEffects(vaccineId) {
+            try {
+                const commonSymptoms = {
+                    'bcg1': [
+                        { name: "احمرار في موق الحقن", severity: "خفيف" },
+                        { name: "تور صغير في موقع الحقن", severity: "خفيف" },
+                        { name: "تقرح بسيط في موقع الحقن", severity: "متوسط" }
+                    ],
+                    'hepb1': [
+                        { name: "ألم في موقع الحقن", severity: "خفيف" },
+                        { name: "احمرار خفيف", severity: "خفيف" },
+                        { name: "صداع خفيف", severity: "خفيف" }
+                    ],
+                    'dtp1': [
+                        { name: "حمى خفيفة", severity: "خفيف" },
+                        { name: "تورم في موقع الحقن", severity: "خفيف" },
+                        { name: "بكاء متقطع", severity: "متوسط" },
+                        { name: "فقدان الشهية", severity: "خفيف" }
+                    ],
+                    'polio1': [
+                        { name: "تهيج خفيف", severity: "خفيف" },
+                        { name: "إسهال خفيف", severity: "خفيف" },
+                        { name: "فقدان الشهية", severity: "خفيف" }
+                    ],
+                    'hib1': [
+                        { name: "احمرار في موقع الحقن", severity: "خفيف" },
+                        { name: "تورم خفيف", severity: "خفيف" },
+                        { name: "حمى خفيفة", severity: "خفيف" }
+                    ],
+                    'pcv1': [
+                        { name: "ألم في موقع الحقن", severity: "خفيف" },
+                        { name: "احمرار", severity: "خفيف" },
+                        { name: "نعاس", severity: "خفيف" },
+                        { name: "فقدان الشهية مؤقت", severity: "خفيف" }
+                    ],
+                    'rota1': [
+                        { name: "إسهال خفيف", severity: "خفيف" },
+                        { name: "تهيج", severity: "خفيف" },
+                        { name: "فقدان الشهية مؤقت", severity: "خفيف" }
+                    ],
+                    'mmr1': [
+                        { name: "حمى", severity: "متوسط" },
+                        { name: "طفح جلدي خفيف", severity: "خفيف" },
+                        { name: "تورم الغدد", severity: "متوسط" },
+                        { name: "ألم في المفاصل", severity: "متوسط" }
+                    ],
+                    'var1': [
+                        { name: "مى خفيفة", severity: "خفيف" },
+                        { name: "طفح جلدي", severity: "متوسط" },
+                        { name: "حكة", severity: "خفيف" }
+                    ],
+                    'hepa1': [
+                        { name: "ألم في موقع الحقن", severity: "خفيف" },
+                        { name: "صداع", severity: "خفيف" },
+                        { name: "تعب وإرهاق", severity: "خفيف" }
+                    ],
+                    'flu1': [
+                        { name: "ألم في موقع الحقن", severity: "خفيف" },
+                        { name: "صداع", severity: "خفيف" },
+                        { name: "تعب وإرهاق", severity: "خفيف" },
+                        { name: "آلام عضلية", severity: "متوسط" }
+                    ],
+                    'dtp2': [
+                        { name: "حمى خفيفة", severity: "خفيف" },
+                        { name: "تورم في موقع الحقن", severity: "خفيف" },
+                        { name: "تهيج", severity: "متوسط" }
+                    ],
+                    'dtp3': [
+                        { name: "حمى خفيف", severity: "خفيف" },
+                        { name: "تورم في موقع الحقن", severity: "خفيف" },
+                        { name: "تهيج", severity: "متوسط" }
+                    ],
+                    'dtp4': [
+                        { name: "حمى خفيفة", severity: "خفيف" },
+                        { name: "تورم في موقع الحقن", severity: "خفيف" },
+                        { name: "تهيج", severity: "متوسط" }
+                    ],
+                    'mmr2': [
+                        { name: "حمى", severity: "متوسط" },
+                        { name: "طفح جلدي خفيف", severity: "خفيف" },
+                        { name: "تورم الغدد", severity: "متوسط" }
+                    ],
+                    'hepa2': [
+                        { name: "ألم في موقع الحقن", severity: "خفيف" },
+                        { name: "صداع", severity: "خفيف" },
+                        { name: "تعب خفيف", severity: "خفف" }
+                    ],
+                    'flu2': [
+                        { name: "ألم في موقع الحقن", severity: "خفيف" },
+                        { name: "صداع", severity: "خفيف" },
+                        { name: "عب ورهاق", severity: "خفيف" }
+                    ],
+                    'polio2': [
+                        { name: "تهيج خفيف", severity: "خفيف" },
+                        { name: "إسهال خفيف", severity: "خفيف" }
+                    ],
+                    'polio3': [
+                        { name: "تهيج خفيف", severity: "خفيف" },
+                        { name: "إسهال خفيف", severity: "خفيف" }
+                    ],
+                    'polio4': [
+                        { name: "تهيج خفيف", severity: "خفيف" },
+                        { name: "إسهال خفيف", severity: "خفيف" }
+                    ],
+                    'hib2': [
+                        { name: "احمرار في موقع الحقن", severity: "خفيف" },
+                        { name: "تورم خفيف", severity: "خفيف" }
+                    ],
+                    'hib3': [
+                        { name: "احمرار في موقع الحقن", severity: "خفيف" },
+                        { name: "تورم خفيف", severity: "خفيف" }
+                    ],
+                    'pcv2': [
+                        { name: "ألم في موقع الحقن", severity: "خفيف" },
+                        { name: "احمرار", severity: "خفيف" },
+                        { name: "نعاس", severity: "خفيف" }
+                    ],
+                    'pcv3': [
+                        { name: "أم في موقع الحقن", severity: "خفيف" },
+                        { name: "احمرار", severity: "خفيف" },
+                        { name: "نعاس", severity: "خفيف" }
+                    ],
+                    'rota2': [
+                        { name: "إسهال خفيف", severity: "خفيف" },
+                        { name: "تهيج", severity: "خفيف" }
+                    ],
+                    'rota3': [
+                        { name: "إسهال خفيف", severity: "خفيف" },
+                        { name: "تهيج", severity: "خفيف" }
+                    ]
+                };
+
+                // إنشاء النافذة الجانبية إذا لم تكن موجودة
+                let sidePanel = document.getElementById('sideEffectsPanel');
+                if (!sidePanel) {
+                    sidePanel = document.createElement('div');
+                    sidePanel.id = 'sideEffectsPanel';
+                    sidePanel.className = 'side-panel';
+                    document.body.appendChild(sidePanel);
+                }
+
+                // إنشاء الخلفية المعتمة
+                let overlay = document.getElementById('sidePanelOverlay');
+                if (!overlay) {
+                    overlay = document.createElement('div');
+                    overlay.id = 'sidePanelOverlay';
+                    overlay.className = 'overlay';
+                    document.body.appendChild(overlay);
+                }
+
+                // إلب الأعراض المبلغ عنها من المستخدمين
+                const reportedSymptoms = await firebase.database()
+                    .ref(`vaccines/${vaccineId}/sideEffects`)
+                    .once('value');
+                
+                let reportedSymptomsHTML = '';
+                if (reportedSymptoms.exists()) {
+                    reportedSymptomsHTML = `
+                        <div class="reported-symptoms">
+                            <h4>
+                                <i class="fas fa-user-shield"></i>
+                                الأعراض المبلغ عنها م المستخدمين
+                            </h4>
+                            <div class="symptoms-list">
+                                ${Object.values(reportedSymptoms.val()).map(symptom => `
+                                    <div class="symptom-card">
+                                        <div class="symptom-icon">
+                                            <i class="fas fa-comment-medical"></i>
+                                        </div>
+                                        <div class="symptom-details">
+                                            <span class="symptom-name">${symptom.name}</span>
+                                            ${symptom.description ? 
+                                                `<span class="symptom-description">${symptom.description}</span>` 
+                                                : ''}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // جلب الأعراض المسجلة من المستخدم
+                const nationalId = localStorage.getItem('nationalId');
+                const userSymptoms = await firebase.database()
+                    .ref(`users/${nationalId}/symptoms/${vaccineId}`)
+                    .once('value');
+                
+                let userSymptomsHTML = '';
+                if (userSymptoms.exists()) {
+                    userSymptomsHTML = `
+                        <div class="user-symptoms">
+                            <h4>
+                                <i class="fas fa-user"></i>
+                                الأعراض المسجلة من قبلك
+                            </h4>
+                            <div class="symptoms-list">
+                                ${Object.values(userSymptoms.val()).map(symptom => `
+                                    <div class="symptom-card">
+                                        <div class="symptom-icon">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <div class="symptom-details">
+                                            <span class="symptom-name">${symptom.name}</span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                sidePanel.innerHTML = `
+                    <div class="side-panel-header">
+                        <h3>
+                            <i class="fas fa-shield-virus"></i>
+                            ${getVaccineName(vaccineId)}
+                        </h3>
+                        <button class="close-panel" onclick="closeSidePanel()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="symptoms-container">
+                        <div class="common-symptoms">
+                            <h4>
+                                <i class="fas fa-exclamation-circle"></i>
+                                 الأعراض الشائعة 
+                            </h4>
+                            <div class="symptoms-list">
+                                ${(commonSymptoms[vaccineId] || []).map(symptom => `
+                                    <div class="symptom-card ${symptom.severity}">
+                                        <div class="symptom-icon">
+                                            <i class="fas ${getSeverityIcon(symptom.severity)}"></i>
+                                        </div>
+                                        <div class="symptom-details">
+                                            <span class="symptom-name">${symptom.name}</span>
+                                            <span class="severity-badge">${getSeverityLabel(symptom.severity)}</span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div class="symptom-card other-symptom">
+                            <div class="symptom-icon">
+                                <i class="fas fa-plus-circle"></i>
+                            </div>
+                            <div class="symptom-details">
+                                <span class="symptom-name">عرض آخر</span>
+                                <span class="severity-badge">إضافة عرض غير مدرج</span>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    
+                        
+                        ${reportedSymptomsHTML}
+                        ${userSymptomsHTML}
+                        
+                        <!-- زر إضافة عرض جديد -->
+                        
+                `;
+
+                // تفعيل النافذة والخلفية
+                setTimeout(() => {
+                    sidePanel.classList.add('active');
+                    overlay.classList.add('active');
+                }, 10);
+
+                localStorage.setItem('currentVaccineId', vaccineId);
+
+                // تعديل مستمعات الأحداث للبطاقات
+                const symptomCards = document.querySelectorAll('.symptom-card:not(.other-symptom)');
+                symptomCards.forEach(card => {
+                    const symptomName = card.querySelector('.symptom-name').textContent;
+                    card.addEventListener('click', () => checkSymptoms(vaccineId, symptomName));
+                });
+
+                // إضافة مستمع حدث منفصل للعرض الآخر
+                const otherSymptomCard = sidePanel.querySelector('.other-symptom');
+                otherSymptomCard.addEventListener('click', () => {
+                    showOtherSymptomDialog(vaccineId);
+                });
+            } catch (error) {
+                console.error('خطأ في تحميل الأعراض:', error);
+                showNotification('حدث خطأ في تحميل الأعراض', 'error');
+            }
+        }
+
+        // دوال مساعدة
+        function getSeverityIcon(severity) {
+            switch(severity) {
+                case 'خفيف': return 'fa-check-circle';
+                case 'متوسط': return 'fa-exclamation-circle';
+                case 'شديد': return 'fa-exclamation-triangle';
+                default: return 'fa-info-circle';
+            }
+        }
+
+        function getSeverityLabel(severity) {
+            switch(severity) {
+                case 'خفيف': return 'عرض خفيف';
+                case 'متوسط': return 'عرض متوسط';
+                case 'شديد': return 'عرض شديد';
+                default: return 'غير محدد';
+            }
+        }
+
+        // إظهار رسالة للمستخدم
+        function showNotification(message, type) {
+            alert(message); // يمكنك تحسين هذه الدالة لعرض إشعارات أجمل
+        }
+
+        // فتح نموذج إضافة عرض جديد
+        document.getElementById('reportNewSymptom').addEventListener('click', () => {
+            document.getElementById('newSymptomModal').style.display = 'block';
+        });
+
+        // إغلاق النموذج
+        function closeModal() {
+            document.getElementById('newSymptomModal').style.display = 'none';
+        }
+
+        // معالجة إضافة عرض جديد
+        document.getElementById('newSymptomForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const userId = localStorage.getItem('currentUserId');
+            const vaccineId = localStorage.getItem('currentVaccineId');
+            const symptomName = document.getElementById('symptomName').value;
+            const symptomDescription = document.getElementById('symptomDescription').value;
+
+            try {
+                const newSymptomRef = firebase.database().ref(`vaccines/${vaccineId}/sideEffects`).push();
+                
+                await newSymptomRef.set({
+                    name: symptomName,
+                    description: symptomDescription,
+                    reportedBy: userId,
+                    reportedAt: firebase.database.ServerValue.TIMESTAMP
+                });
+
+                await firebase.database().ref(`users/${userId}/reportedSymptoms/${vaccineId}/${newSymptomRef.key}`).set({
+                    name: symptomName,
+                    description: symptomDescription,
+                    reportedAt: firebase.database.ServerValue.TIMESTAMP
+                });
+
+                showNotification('تم إ��افة العرض بنجاح', 'success');
+                closeModal();
+                await showSideEffects(vaccineId);
+            } catch (error) {
+                console.error('خطأ في إضافة العرض:', error);
+                showNotification('حدث خطأ في إضافة العرض', 'error');
+            }
+        });
+
+        // تحميل التطعيمات عند فتح الصفحة
+        document.addEventListener('DOMContentLoaded', loadCompletedVaccines);
+
+        // دالة إغلاق النافذة الجانبية
+        function closeSidePanel() {
+            const sidePanel = document.getElementById('sideEffectsPanel');
+            const overlay = document.getElementById('sidePanelOverlay');
+            
+            sidePanel.classList.remove('active');
+            overlay.classList.remove('active');
+            
+            setTimeout(() => {
+                overlay.style.visibility = 'hidden';
+            }, 300);
+        }
+
+        // دالة للتحقق من العراض
+        async function checkSymptoms(vaccineId, symptomName) {
+            const nationalId = localStorage.getItem('nationalId');
+            if (!nationalId) return;
+
+            try {
+                // التحقق من وجود علاج سابق
+                const previousTreatment = await firebase.database()
+                    .ref(`users/${nationalId}/treatments/${vaccineId}/${encodeURIComponent(symptomName)}`)
+                    .once('value');
+
+                if (previousTreatment.exists()) {
+                    // إذا وجد علاج سابق، انتقل مباشرة لصفحة العلاج
+                    window.location.href = `treatment.html?symptom=${encodeURIComponent(symptomName)}&vaccine=${vaccineId}`;
+                    return;
+                }
+
+                // إذا لم يوجد علاج سابق، اعرض نافذة السؤال
+                const dialog = document.createElement('div');
+                dialog.className = 'symptoms-dialog';
+                dialog.innerHTML = `
+                    <div class="symptoms-question">
+                        هل تعاني من ${symptomName}؟
+                    </div>
+                    <div class="symptoms-buttons">
+                        <button class="symptom-btn yes" onclick="reportSymptom('${vaccineId}', '${symptomName}', true)">
+                            <i class="fas fa-check"></i> نعم
+                        </button>
+                        <button class="symptom-btn no" onclick="reportSymptom('${vaccineId}', '${symptomName}', false)">
+                            <i class="fas fa-times"></i> لا
+                        </button>
+                    </div>
+                `;
+
+                document.body.appendChild(dialog);
+                setTimeout(() => dialog.classList.add('active'), 10);
+            } catch (error) {
+                console.error('خطأ في التحقق من العلاج السابق:', error);
+                showNotification('حدث خطأ في معالجة الطلب', 'error');
+            }
+        }
+
+        // دالة لتسجيل الأعراض
+        async function reportSymptom(vaccineId, symptomName, hasSymptom) {
+            const nationalId = localStorage.getItem('nationalId');
+            const dialog = document.querySelector('.symptoms-dialog');
+            
+            if (hasSymptom) {
+                try {
+                    // تسجيل العرض في Firebase
+                    await firebase.database().ref(`users/${nationalId}/symptoms/${vaccineId}`).push({
+                        name: symptomName,
+                        reportedAt: firebase.database.ServerValue.TIMESTAMP
+                    });
+
+                    // فتح صفحة العلاج
+                    window.location.href = `treatment.html?symptom=${encodeURIComponent(symptomName)}&vaccine=${vaccineId}`;
+                } catch (error) {
+                    console.error('خطأ في تجيل العرض:', error);
+                    showNotification('حدث خطأ في تسجيل العرض', 'error');
+                }
+            }
+
+            // إغلاق النافذة المنبثقة
+            dialog.classList.remove('active');
+            setTimeout(() => dialog.remove(), 300);
+        }
+
+        // دالة لإظهار نافذة إدخال عرض آخر
+        function showOtherSymptomDialog(vaccineId) {
+            // إغلاق أي نوافذ حوار موجودة
+            const existingDialogs = document.querySelectorAll('.symptoms-dialog');
+            existingDialogs.forEach(dialog => {
+                dialog.remove();
+            });
+
+            const dialog = document.createElement('div');
+            dialog.className = 'symptoms-dialog';
+            dialog.innerHTML = `
+                <div class="symptoms-question">
+                    <h3>إضافة عرض جديد</h3>
+                    <div class="input-group">
+                        <input type="text" 
+                               id="otherSymptomInput" 
+                               placeholder="اكتب العرض الذي تعاني منه"
+                               class="custom-input">
+                    </div>
+                </div>
+                <div class="symptoms-buttons">
+                    <button class="symptom-btn yes" onclick="submitOtherSymptom('${vaccineId}')">
+                        <i class="fas fa-check"></i> إرسال
+                    </button>
+                    <button class="symptom-btn no" onclick="closeSymptomDialog()">
+                        <i class="fas fa-times"></i> إلغاء
+                    </button>
+                </div>
+            `;
+
+            document.body.appendChild(dialog);
+            setTimeout(() => dialog.classList.add('active'), 10);
+            
+            // تركيز تلقائي على حقل الإدخال
+            document.getElementById('otherSymptomInput').focus();
+        }
+
+        // دالة لإرسال العرض الجديد
+        async function submitOtherSymptom(vaccineId) {
+            const symptomInput = document.getElementById('otherSymptomInput');
+            const symptomName = symptomInput.value.trim();
+            
+            if (!symptomName) {
+                showNotification('الرجاء كتابة العرض', 'error');
+                return;
+            }
+
+            try {
+                // تسجيل العرض وفتح صفحة العلاج
+                const nationalId = localStorage.getItem('nationalId');
+                await firebase.database().ref(`users/${nationalId}/symptoms/${vaccineId}`).push({
+                    name: symptomName,
+                    reportedAt: firebase.database.ServerValue.TIMESTAMP,
+                    isCustom: true
+                });
+
+                // فتح صفحة العلاج
+                window.location.href = `treatment.html?symptom=${encodeURIComponent(symptomName)}&vaccine=${vaccineId}`;
+            } catch (error) {
+                console.error('خطأ في تسجيل العرض:', error);
+                showNotification('حدث خطأ في تسجيل العرض', 'error');
+            }
+        }
+
+        // دالة لإغلاق نافذة الحوار
+        function closeSymptomDialog() {
+            const dialog = document.querySelector('.symptoms-dialog');
+            if (dialog) {
+                dialog.classList.remove('active');
+                setTimeout(() => dialog.remove(), 300);
+            }
+        }
+    </script>
+</body>
+</html> 

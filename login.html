@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <link rel="icon" type="image/x-icon" href="https://www2.0zz0.com/2024/11/17/11/646664920.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - نظام التطعيمات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #2ecc71;
+            --warning-color: #f1c40f;
+            --background-color: #f8fafc;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background: var(--background-color);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(44, 62, 80, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(52, 152, 219, 0.1) 0%, transparent 20%);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .logo i {
+            font-size: 3.5em;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        h1 {
+            color: #333;
+            font-size: 1.8em;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .input-wrapper {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            transition: color 0.3s ease;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            padding-right: 45px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: var(--background-color);
+        }
+
+        input:focus {
+            border-color: var(--secondary-color);
+            background: white;
+            box-shadow: 0 0 0 5px rgba(52, 152, 219, 0.1);
+            outline: none;
+        }
+
+        input:focus + i {
+            color: var(--secondary-color);
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+
+        .register-link a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .register-link a:hover {
+            color: var(--primary-color);
+        }
+
+        .error-message {
+            color: var(--accent-color);
+            font-size: 0.85em;
+            margin-top: 5px;
+            display: none;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* تأثيرات إضافية للتحميل */
+        .loading {
+            display: none;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .loading i {
+            animation: spin 1s infinite linear;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* إضافة أنماط التحميل */
+        .loading-state {
+            position: relative;
+        }
+
+        .loading-state .button-text {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .loading-state .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+        }
+
+        .loading i {
+            animation: spin 1s infinite linear;
+        }
+
+        button.success {
+            background: linear-gradient(135deg, var(--success-color), #27ae60) !important;
+        }
+
+        button.error {
+            background: linear-gradient(135deg, var(--accent-color), #c0392b) !important;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3) !important;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* تحسين شكل رسالة الخطأ */
+        .error-message {
+            margin-top: 8px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            background-color: rgba(231, 76, 60, 0.1);
+            border-right: 3px solid var(--accent-color);
+            color: var(--accent-color);
+            font-weight: 600;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <i class="fas fa-syringe"></i>
+            <h1>نظام متابعة التطعيمات</h1>
+        </div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="nationalId">الرقم القومي</label>
+                <div class="input-wrapper">
+                    <input type="text" id="nationalId" required 
+                           placeholder="أدخل الرقم القومي المكون من 14 رقم">
+                    <i class="fas fa-id-card"></i>
+                </div>
+                <div class="error-message" id="idError">يرجى إدخال رقم قومي صحيح</div>
+            </div>
+
+            <button type="submit" id="loginButton">
+                <span class="button-text">
+                    <i class="fas fa-sign-in-alt"></i>
+                    متابعة
+                </span>
+                <span class="loading">
+                    <i class="fas fa-spinner"></i>
+                </span>
+            </button>
+
+            <div class="register-link">
+                ليس لديك حساب؟ <a href="sign.html">تسجيل حساب جديد</a>
+            </div>
+        </form>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        // التحقق من وجود بيانات مسجلة عند تحميل الصفحة
+        window.onload = function() {
+            const userData = localStorage.getItem('userData');
+            if (userData) {
+                window.location.href = './vaccines.html';
+            }
+        }
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYMRiJQs8vsapzX1bMHTWjrEb-N2ePIPo",
+            authDomain: "mhd-vaxtracker.firebaseapp.com",
+            databaseURL: "https://mhd-vaxtracker-default-rtdb.firebaseio.com",
+            projectId: "mhd-vaxtracker",
+            storageBucket: "mhd-vaxtracker.firebasestorage.app",
+            messagingSenderId: "104907445114",
+            appId: "1:104907445114:web:6110c5cf4e2607ed677cc3",
+            measurementId: "G-RF9SYJ2KCH"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        window.handleLogin = async function(event) {
+            event.preventDefault();
+            
+            const nationalId = document.getElementById('nationalId').value;
+            const loginButton = document.getElementById('loginButton');
+            const buttonText = document.querySelector('.button-text');
+            const loadingSpan = document.querySelector('.loading');
+            const errorMessage = document.getElementById('idError');
+            
+            // التحقق من صحة الرقم القومي
+            if (nationalId.length !== 14 || isNaN(nationalId)) {
+                loginButton.classList.add('error');
+                showError('يرجى إدخال رقم قومي صحيح مكون من 14 رقم');
+                return;
+            }
+
+            try {
+                startLoading();
+
+                // التحقق من وجود المستخدم في قاعدة البيانات
+                const userRef = ref(database, 'users/' + nationalId);
+                const snapshot = await get(userRef);
+
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    
+                    // تخزين الرقم القومي وبيانات المستخدم
+                    localStorage.setItem('nationalId', nationalId);
+                    localStorage.setItem('userData', JSON.stringify(userData));
+                    
+                    // إظهار نجاح تسجيل الدخول
+                    showSuccess();
+                    
+                    // الانتقال إلى الصفحة الرئيسية بعد تأخير
+                    setTimeout(() => {
+                        window.location.href = 'vaccines.html';
+                    }, 1000);
+                } else {
+                    showError('هذا الرقم القومي غير مسجل');
+                }
+            } catch (error) {
+                console.error("خطأ في تسجيل الدخول:", error);
+                showError('حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى');
+            }
+        }
+
+        function startLoading() {
+            const loginButton = document.getElementById('loginButton');
+            const buttonText = document.querySelector('.button-text');
+            const loadingSpan = document.querySelector('.loading');
+            const errorMessage = document.getElementById('idError');
+
+            loginButton.classList.add('loading-state');
+            buttonText.style.opacity = '0';
+            loadingSpan.style.display = 'flex';
+            loginButton.disabled = true;
+            errorMessage.style.display = 'none';
+        }
+
+        function showSuccess() {
+            const loginButton = document.getElementById('loginButton');
+            const loadingSpan = document.querySelector('.loading');
+            const buttonText = document.querySelector('.button-text');
+
+            loadingSpan.style.display = 'none';
+            buttonText.style.opacity = '1';
+            buttonText.innerHTML = '<i class="fas fa-check"></i> تم تسجيل الدخول';
+            loginButton.classList.remove('loading-state');
+            loginButton.classList.add('success');
+        }
+
+        function showError(message) {
+            const loginButton = document.getElementById('loginButton');
+            const loadingSpan = document.querySelector('.loading');
+            const buttonText = document.querySelector('.button-text');
+            const errorMessage = document.getElementById('idError');
+
+            loadingSpan.style.display = 'none';
+            buttonText.style.opacity = '1';
+            loginButton.classList.remove('loading-state');
+            loginButton.classList.add('error');
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+
+            // إعادة تعيين حالة الزر بعد فترة
+            setTimeout(() => {
+                loginButton.classList.remove('error');
+                loginButton.disabled = false;
+                buttonText.innerHTML = '<i class="fas fa-sign-in-alt"></i> متابعة';
+                errorMessage.style.display = 'none';
+            }, 2000);
+        }
+        if (!isValid) {
+                button.classList.add('error');
+                setTimeout(() => {
+                    button.classList.remove('error');
+                }, 500);
+            }
+
+
+        // التحقق من وجود جلسة مسجلة عند تحميل الصفحة
+        window.onload = function() {
+            const userData = localStorage.getItem('userData');
+            if (userData) {
+                window.location.href = 'vaccines.html';
+            }
+        }
+        // التحقق من وجود بيانات مسجلة عند تحميل الصفحة
+    </script>
+</body>
+</html>
