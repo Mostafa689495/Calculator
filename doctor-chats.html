@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <link rel="icon" type="image/x-icon" href="https://www2.0zz0.com/2024/11/17/11/646664920.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المحادثات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        :root {
+            --primary-color: #2196F3;
+            --secondary-color: #1976D2;
+            --accent-color: #FF4081;
+            --success-color: #4CAF50;
+            --background-color: #F5F7FA;
+            --text-primary: #263238;
+            --text-secondary: #546E7A;
+            --card-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --header-gradient: linear-gradient(135deg, #2196F3, #1976D2);
+            --border-radius: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background: var(--background-color);
+            min-height: 100vh;
+            padding: 12px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: var(--header-gradient);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-box {
+            background: white;
+            padding: 16px;
+            border-radius: var(--border-radius);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            box-shadow: var(--card-shadow);
+        }
+
+        .search-box input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 8px;
+            font-size: 1rem;
+            color: var(--text-primary);
+            background: transparent;
+        }
+
+        .search-box i {
+            color: var(--secondary-color);
+            font-size: 1.2rem;
+            margin: 0 8px;
+        }
+
+        .chat-item {
+            background: white;
+            padding: 16px;
+            border-radius: var(--border-radius);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .chat-avatar {
+            width: 50px;
+            height: 50px;
+            background: var(--header-gradient);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .chat-content {
+            flex: 1;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .chat-header h3 {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .time {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .last-message {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .patient-info {
+            display: flex;
+            gap: 15px;
+            margin-top: 8px;
+            font-size: 0.9rem;
+        }
+
+        .patient-info span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--text-secondary);
+            background: rgba(52, 152, 219, 0.1);
+            padding: 4px 12px;
+            border-radius: 12px;
+        }
+
+        .unread-badge {
+            background: var(--accent-color);
+            color: white;
+            min-width: 20px;
+            height: 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 6px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .empty-state {
+            background: white;
+            padding: 32px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            box-shadow: var(--card-shadow);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--secondary-color);
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+        }
+
+        .loading-state {
+            background: white;
+            padding: 32px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            box-shadow: var(--card-shadow);
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+
+            .header {
+                padding: 16px;
+            }
+
+            .header h1 {
+                font-size: 1.2rem;
+            }
+
+            .chat-item {
+                padding: 12px;
+            }
+
+            .chat-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            .chat-header h3 {
+                font-size: 1rem;
+            }
+
+            .last-message {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="fas fa-comments"></i>
+                محادثات المرضى
+            </h1>
+            <button class="back-btn" onclick="location.href='medical-center.html'">
+                <i class="fas fa-arrow-right"></i>
+                رجوع
+            </button>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="ابحث عن مريض...">
+            <i class="fas fa-search"></i>
+        </div>
+
+        <div id="chatList"></div>
+    </div>
+
+    <script>
+        // تهيئة Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYMRiJQs8vsapzX1bMHTWjrEb-N2ePIPo",
+            authDomain: "mhd-vaxtracker.firebaseapp.com",
+            databaseURL: "https://mhd-vaxtracker-default-rtdb.firebaseio.com",
+            projectId: "mhd-vaxtracker",
+            storageBucket: "mhd-vaxtracker.firebasestorage.app",
+            messagingSenderId: "104907445114",
+            appId: "1:104907445114:web:6110c5cf4e2607ed677cc3",
+            measurementId: "G-RF9SYJ2KCH"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+
+        class DoctorChatManager {
+            constructor() {
+                this.db = firebase.database();
+                this.doctorId = localStorage.getItem('nationalId');
+                this.chats = [];
+                this.searchInput = document.getElementById('searchInput');
+                this.setupSearchListener();
+                this.onlineUsers = new Set();
+                this.isLoading = true;
+                this.showLoading();
+                this.initialize();
+            }
+
+            setupSearchListener() {
+                this.searchInput.addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.toLowerCase();
+                    this.filterChats(searchTerm);
+                });
+            }
+
+            async initialize() {
+                try {
+                    this.isLoading = true;
+                    this.showLoading();
+                    await this.loadChats();
+                    this.setupRealtimeListeners();
+                } catch (error) {
+                    console.error('خطأ في تهيئة المحادثات:', error);
+                    this.showError('حدث خطأ في تحميل المحادثات');
+                } finally {
+                    this.isLoading = false;
+                }
+            }
+
+            async loadChats() {
+                try {
+                    const chatsRef = this.db.ref('chats');
+                    const snapshot = await chatsRef
+                        .orderByChild(`participants/${this.doctorId}`)
+                        .equalTo(true)
+                        .once('value');
+
+                    const chatsData = snapshot.val() || {};
+                    const newChats = await Promise.all(
+                        Object.entries(chatsData).map(async ([chatId, chat]) => {
+                            const [patientId] = chatId.split('_');
+                            
+                            if (!patientId) {
+                                console.error('لم يتم العثور على معرف المريض في المحادثة:', chatId);
+                                return null;
+                            }
+                            
+                            const patientInfo = await this.getPatientInfo(patientId);
+                            return {
+                                id: chatId,
+                                ...chat,
+                                patientInfo
+                            };
+                        })
+                    );
+
+                    const validChats = newChats.filter(chat => chat !== null);
+
+                    if (JSON.stringify(this.chats) !== JSON.stringify(validChats)) {
+                        this.chats = validChats;
+                        this.isLoading = false;
+                        this.renderChats(this.chats);
+                    }
+                } catch (error) {
+                    console.error('خطأ في تحميل المحادثات:', error);
+                    throw error;
+                }
+            }
+
+            async getPatientInfo(patientId) {
+                try {
+                    // البحث في جدول users مباشرة
+                    const userSnapshot = await this.db.ref('users')
+                        .orderByChild('nationalId')
+                        .equalTo(patientId)
+                        .once('value');
+                    
+                    const userData = userSnapshot.val();
+                    
+                    if (userData) {
+                        // استخراج بيانات المستخدم
+                        const userInfo = Object.values(userData)[0];
+                        return {
+                            name: userInfo.name || userInfo.fullName || userInfo.username || patientId,
+                            nationalId: patientId,
+                            phone: userInfo.phoneNumber || userInfo.phone || '',
+                            email: userInfo.email || ''
+                        };
+                    }
+
+                    // إذا لم يتم العثور على المستخدم في جدول users
+                    const patientSnapshot = await this.db.ref(`patients/${patientId}`).once('value');
+                    const patientData = patientSnapshot.val();
+                    
+                    if (patientData) {
+                        return {
+                            name: patientData.name || patientData.fullName || patientData.username || patientId,
+                            nationalId: patientId,
+                            phone: patientData.phoneNumber || patientData.phone || '',
+                            email: patientData.email || ''
+                        };
+                    }
+
+                    return {
+                        name: patientId,
+                        nationalId: patientId
+                    };
+                } catch (error) {
+                    console.error('خطأ في جلب معلومات المريض:', error);
+                    return {
+                        name: patientId,
+                        nationalId: patientId
+                    };
+                }
+            }
+
+            filterChats(searchTerm) {
+                const filteredChats = this.chats.filter(chat => 
+                    chat.patientInfo?.name?.toLowerCase().includes(searchTerm) ||
+                    chat.patientInfo?.nationalId?.includes(searchTerm) ||
+                    chat.lastMessage?.text?.toLowerCase().includes(searchTerm)
+                );
+                this.renderChats(filteredChats);
+            }
+
+            renderChats(chats) {
+                if (this.isLoading) {
+                    return;
+                }
+
+                const container = document.getElementById('chatList');
+                container.innerHTML = '';
+
+                if (chats.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-comments"></i>
+                            <h3>لا توجد محادثات</h3>
+                            <p>لم يتم العثور على أي محادثات مع المرضى</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                chats.sort((a, b) => 
+                    (b.lastMessage?.timestamp || 0) - (a.lastMessage?.timestamp || 0)
+                ).forEach(chat => {
+                    container.appendChild(this.createChatElement(chat));
+                });
+            }
+
+            createChatElement(chat) {
+                const div = document.createElement('div');
+                div.className = 'chat-item';
+                div.onclick = () => this.openChat(chat.id);
+
+                const patientInfo = chat.patientInfo || {};
+                // استخدام الاسم الكامل إذا وجد، وإلا نستخدم أول جزئين من الاسم
+                const displayName = patientInfo.name || 'مريض جديد';
+                
+                div.innerHTML = `
+                    <div class="chat-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="chat-content">
+                        <div class="chat-header">
+                            <h3>${displayName}</h3>
+                            <span class="time">
+                                <i class="far fa-clock"></i>
+                                ${this.formatTime(chat.lastMessage?.timestamp)}
+                            </span>
+                        </div>
+                        <p class="last-message">
+                            ${chat.lastMessage?.text || 'لا توجد رسائل'}
+                        </p>
+                        <div class="patient-info">
+                            <span>
+                                <i class="fas fa-id-card"></i>
+                                ${patientInfo.nationalId || ''}
+                            </span>
+                            ${patientInfo.phone ? `
+                                <span>
+                                    <i class="fas fa-phone"></i>
+                                    ${patientInfo.phone}
+                                </span>
+                            ` : ''}
+                        </div>
+                    </div>
+                    ${chat.unreadCount ? `
+                        <div class="unread-badge">${chat.unreadCount}</div>
+                    ` : ''}
+                `;
+
+                return div;
+            }
+
+            formatTime(timestamp) {
+                if (!timestamp) return '';
+                const date = new Date(timestamp);
+                return date.toLocaleDateString('ar-EG', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+
+            openChat(chatId) {
+                window.location.href = `doctor-chat.html?chatId=${chatId}`;
+            }
+
+            setupRealtimeListeners() {
+                this.db.ref('chats').on('child_changed', async (snapshot) => {
+                    const updatedChat = snapshot.val();
+                    const chatId = snapshot.key;
+                    
+                    const index = this.chats.findIndex(chat => chat.id === chatId);
+                    if (index !== -1) {
+                        const patientId = Object.keys(updatedChat.participants)
+                            .find(id => id !== this.doctorId);
+                        const patientInfo = await this.getPatientInfo(patientId);
+                        
+                        this.chats[index] = {
+                            id: chatId,
+                            ...updatedChat,
+                            patientInfo
+                        };
+                        
+                        this.renderChats(this.chats);
+                    }
+                });
+            }
+
+            startAutoUpdate() {
+                // تحديث كل ثانيتين
+                setInterval(async () => {
+                    try {
+                        await this.loadChats();
+                    } catch (error) {
+                        console.error('خطأ في التحديث التلقائي:', error);
+                    }
+                }, 2000);
+            }
+
+            showError(message) {
+                const container = document.getElementById('chatList');
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-circle" style="color: var(--accent-color)"></i>
+                        <h3>حدث خطأ</h3>
+                        <p>${message}</p>
+                    </div>
+                `;
+            }
+
+            showLoading() {
+                const container = document.getElementById('chatList');
+                container.innerHTML = `
+                    <div class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <h3>جاري تحميل المحادثات...</h3>
+                        <p>يرجى الانتظار</p>
+                    </div>
+                `;
+            }
+        }
+
+        // بدء التطبيق
+        document.addEventListener('DOMContentLoaded', () => {
+            new DoctorChatManager();
+        });
+    </script>
+</body>
+</html>
