@@ -1,0 +1,2592 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <link rel="icon" type="image/x-icon" href="https://www2.0zz0.com/2024/11/17/11/646664920.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المركز الصحي - نظام التطعيمات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        // تهيئة EmailJS مع معرف المستخدم الخاص بك
+        (function() {
+            emailjs.init("JYT8xIeUJ9tdgMZCf"); // أدخل المفتاح العام الخاص بك هنا
+        })();
+    </script>
+
+    <style>
+        /* متغيرات الألوان والخصائص الأساسية */
+        :root {
+            --primary-color: #2196F3;
+            --secondary-color: #1976D2;
+            --success-color: #4CAF50;
+            --error-color: #f44336;
+            --warning-color: #ff9800;
+            --text-color: #333;
+            --bg-color: #f5f5f5;
+            --card-bg: #ffffff;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        /* إعدادات عامة */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* العنوان الرئيسي */
+        .main-title {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .title-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+        }
+
+        .main-title h1 {
+            color: var(--text-color);
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        /* معلومات الطبيب */
+        .doctor-info-section {
+            background: linear-gradient(135deg, var(--card-bg) 0%, #f8f9fa 100%);
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .doctor-header {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            position: relative;
+        }
+
+        .doctor-avatar {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #64B5F6 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 15px rgba(33, 150, 243, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .doctor-avatar:hover {
+            transform: translateY(-5px);
+        }
+
+        .doctor-avatar i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .doctor-details {
+            flex: 1;
+        }
+
+        .doctor-details h2 {
+            color: var(--text-color);
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .specialty, .hospital {
+            color: #666;
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem;
+        }
+
+        .specialty i, .hospital i {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .notification-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .chat-button {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: white;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .chat-button:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .chat-button i {
+            font-size: 1.2rem;
+        }
+
+        /* تحسينات للشاشات الصغيرة */
+        @media (max-width: 768px) {
+            .doctor-info-section {
+                padding: 20px;
+            }
+
+            .doctor-header {
+                flex-direction: row;
+                align-items: center;
+                text-align: right;
+                gap: 15px;
+            }
+
+            .doctor-avatar {
+                width: 70px;
+                height: 70px;
+                border-radius: 15px;
+            }
+
+            .doctor-avatar i {
+                font-size: 2rem;
+            }
+
+            .doctor-details h2 {
+                font-size: 1.4rem;
+            }
+
+            .specialty, .hospital {
+                font-size: 0.9rem;
+            }
+
+            .notification-container {
+                flex-direction: row;
+                margin-top: 15px;
+            }
+
+            .chat-button {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* قسم البحث */
+        .search-section {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .search-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), #64B5F6);
+        }
+
+        .search-form {
+            display: flex;
+            gap: 15px;
+            position: relative;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .input-wrapper::before {
+            content: '\f002';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 1.1rem;
+            z-index: 1;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px 45px 15px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary-color);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+            outline: none;
+        }
+
+        .search-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0 30px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        .search-button:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .search-button:active {
+            transform: translateY(0);
+        }
+
+        .search-button.loading {
+            background: #ccc;
+            pointer-events: none;
+        }
+
+        .search-button .button-text {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-button .loading-spinner {
+            display: none;
+        }
+
+        .search-button.loading .button-text {
+            display: none;
+        }
+
+        .search-button.loading .loading-spinner {
+            display: block;
+            animation: spin 1s linear infinite;
+        }
+
+        .error-message {
+            margin-top: 15px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            background: #ffebee;
+            color: #d32f2f;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .error-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .error-message i {
+            font-size: 1.1rem;
+        }
+
+        /* تحسينات للموبايل */
+        @media (max-width: 768px) {
+            .search-section {
+                padding: 20px;
+            }
+
+            .search-form {
+                flex-direction: column;
+            }
+
+            .search-button {
+                width: 100%;
+                padding: 12px;
+            }
+
+            input[type="text"] {
+                padding: 12px 40px 12px 12px;
+                font-size: 0.95rem;
+            }
+
+            .input-wrapper::before {
+                font-size: 1rem;
+            }
+        }
+
+        /* تأثيرات حركية */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* تنسيق رسائل الخطأ للمستخدمين المحظورين */
+        .blocked-error {
+            background: #fff3e0;
+            border: 1px solid #ffb74d;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 12px;
+        }
+
+        .blocked-error .error-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .blocked-error i {
+            color: #f57c00;
+            font-size: 1.2rem;
+        }
+
+        .blocked-error .error-text {
+            flex: 1;
+        }
+
+        .blocked-error strong {
+            display: block;
+            color: #e65100;
+            margin-bottom: 4px;
+        }
+
+        .blocked-error p {
+            color: #795548;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .view-blocked-btn {
+            background: #fff;
+            color: #f57c00;
+            border: 1px solid #ffb74d;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .view-blocked-btn:hover {
+            background: #fff3e0;
+            border-color: #f57c00;
+        }
+
+        /* قسم التطعيمات */
+        .vaccines-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .vaccine-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            transition: var(--transition);
+        }
+
+        .vaccine-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .vaccine-info h3 {
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        .vaccine-date {
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* الإشعارات */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: var(--border-radius);
+            background: var(--card-bg);
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .notification.success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .notification.error {
+            background: var(--error-color);
+            color: white;
+        }
+
+        /* التحقق من الهوية */
+        .verification-section {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .verification-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            animation: slideUp 0.4s ease;
+        }
+
+        .verification-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .verification-header h2 {
+            color: var(--text-color);
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .verification-header p {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .verification-progress {
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin: 25px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), #64B5F6);
+            border-radius: 3px;
+            transition: width 0.4s ease;
+        }
+
+        .question-box {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .question-text {
+            color: var(--text-color);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .options-container {
+            display: grid;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        /* تحديث تصميم أزرار الخيارات */
+        .option-btn {
+            background: white;
+            color: var(--text-color);
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary-color);
+            background: rgba(33, 150, 243, 0.05);
+        }
+
+        /* إزالة التأثير القديم وإضافة تصميم جديد */
+        .option-btn.selected {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: scale(1.02);
+            box-shadow: 0 4px 8px rgba(33, 150, 243, 0.2);
+        }
+
+        /* إزالة pseudo-element السابق */
+        .option-btn::before {
+            display: none;
+        }
+
+        /* تحسين تباين النص */
+        .option-btn span {
+            position: relative;
+            z-index: 2;
+            font-weight: 600;
+        }
+
+        /* إضافة أيقونة للخيار المحدد */
+        .option-btn.selected::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            margin-right: 8px;
+            font-size: 1rem;
+        }
+
+        /* تحسين حالة التحويم للخيار المحدد */
+        .option-btn.selected:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        /* تحسين المظهر على الموبايل */
+        @media (max-width: 768px) {
+            .option-btn {
+                padding: 12px 15px;
+                font-size: 0.95rem;
+            }
+            
+            .option-btn.selected::after {
+                font-size: 0.9rem;
+            }
+        }
+
+        .verify-btn {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 12px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .verify-btn:not(:disabled):hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .verify-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .verify-btn .btn-loader {
+            display: none;
+        }
+
+        .verify-btn.loading .btn-text {
+            display: none;
+        }
+
+        .verify-btn.loading .btn-loader {
+            display: block;
+        }
+
+        /* تأثيرات حركية */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* تحسينات للموبايل */
+        @media (max-width: 768px) {
+            .verification-card {
+                padding: 20px;
+            }
+
+            .verification-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .question-text {
+                font-size: 1.1rem;
+            }
+
+            .option-btn {
+                padding: 12px 15px;
+                font-size: 0.95rem;
+            }
+        }
+
+        /* التكيف مع الشاشات الصغيرة */
+        @media (max-width: 768px) {
+            .search-form {
+                flex-direction: column;
+            }
+
+            .options-container {
+                grid-template-columns: 1fr;
+            }
+
+            .doctor-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        /* تصميم قسم معلومات المريض والتطعيمات */
+        #vaccinesSection {
+            animation: fadeSlideUp 0.5s ease;
+        }
+
+        .user-details {
+            background: linear-gradient(135deg, #fff, #f8f9fa);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .user-details h2 {
+            color: var(--text-color);
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-details h2::before {
+            content: '\f007';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .user-details p {
+            display: flex;
+            align-items: center;
+            margin: 12px 0;
+            padding: 10px 15px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .user-details p:hover {
+            transform: translateX(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .user-details strong {
+            min-width: 120px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-details strong i {
+            color: var(--primary-color);
+        }
+
+        /* تصميم قسم التطعيمات */
+        .vaccines-section {
+            margin-top: 30px;
+        }
+
+        .vaccines-section h2 {
+            color: var(--text-color);
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .vaccines-section h2::before {
+            content: '\f48e';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            color: var(--primary-color);
+        }
+
+        .vaccines-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .vaccine-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .vaccine-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .vaccine-info h3 {
+            color: var(--text-color);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .vaccine-date {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .vaccine-date i {
+            color: var(--primary-color);
+        }
+
+        .confirm-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: auto;
+        }
+
+        .confirm-btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .confirm-btn i {
+            font-size: 1.1rem;
+        }
+
+        /* رسالة عدم وجود تطعيمات */
+        .no-vaccines {
+            text-align: center;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 16px;
+            color: #666;
+            font-size: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .no-vaccines i {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            opacity: 0.5;
+        }
+
+        /* تأثيرات حركية */
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* تحسينات للموبايل */
+        @media (max-width: 768px) {
+            .user-details {
+                padding: 20px;
+            }
+
+            .user-details h2,
+            .vaccines-section h2 {
+                font-size: 1.3rem;
+            }
+
+            .user-details p {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .user-details strong {
+                min-width: auto;
+            }
+
+            .vaccines-container {
+                grid-template-columns: 1fr;
+            }
+
+            .vaccine-card {
+                padding: 15px;
+            }
+        }
+
+        /* تصميم زر المستخدمين المحظورين */
+        .blocked-users-btn {
+            display: none; /* مخفي افتراضياً */
+            background: #fff3e0;
+            color: #f57c00;
+            border: 1px solid #ffb74d;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            align-items: center;
+            gap: 8px;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .blocked-users-btn:hover {
+            background: #ffe0b2;
+            border-color: #f57c00;
+            transform: translateY(-2px);
+        }
+
+        .blocked-users-btn i {
+            font-size: 0.9rem;
+        }
+
+        .blocked-users-count {
+            background: #f57c00;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+        }
+
+        /* تحسينات للموبايل */
+        @media (max-width: 768px) {
+            .blocked-users-btn {
+                bottom: 15px;
+                left: 15px;
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+        }
+
+        .hide-data-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hide-data-btn i {
+            font-size: 1.1rem;
+        }
+
+        /* تحسينات للموبايل */
+        @media (max-width: 768px) {
+            .hide-data-btn {
+                font-size: 0.9rem;
+                padding: 8px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- العنوان الريسي أولاً -->
+
+
+
+        <!-- بيانات الدكتور ثانياً -->
+        <div class="doctor-info-section">
+            <div class="doctor-header">
+                <div class="doctor-avatar">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="doctor-details">
+                    <h2>د. ${doctorData.name}</h2>
+                    <p class="specialty">
+                        <i class="fas fa-stethoscope"></i>
+                        ${doctorData.specialty}
+                    </p>
+                    <p class="hospital">
+                        <i class="fas fa-hospital"></i>
+                        ${doctorData.hospital}
+                    </p>
+                </div>
+            </div>
+            <div class="notification-container">
+                <button class="chat-button" onclick="location.href='doctor-notifications.html'">
+                    <i class="fas fa-bell"></i>
+                    الإشعارات
+                </button>
+                <button class="chat-button" onclick="location.href='doctor-chats.html'">
+                    <i class="fas fa-comments"></i>
+                    المحادثات
+                </button>
+            </div>
+        </div>
+
+        <!-- باقي المحتوى -->
+        <div class="search-section">
+            <div class="search-form">
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        id="nationalId" 
+                        placeholder="أدخل الرقم القومي للمريض" 
+                        maxlength="14"
+                        autocomplete="off"
+                    >
+                </div>
+                <button class="search-button" onclick="searchUser()" id="searchButton">
+                    <span class="button-text">
+                        <i class="fas fa-search"></i>
+                        بحث
+                    </span>
+                    <span class="loading-spinner">
+                        <i class="fas fa-spinner"></i>
+                    </span>
+                </button>
+            </div>
+            <div id="searchError" class="error-message"></div>
+        </div>
+
+        <div id="vaccinesSection" style="display: none;">
+            <div class="user-details">
+                <h2>معلومات المريض</h2>
+                <p id="userName"><strong>الاسم:</strong> <span></span></p>
+                <p id="userBirthDate"><strong>تاريخ الميلاد:</strong> <span></span></p>
+            </div>
+
+            <h2>التطعيمات المستحقة</h2>
+            <div id="upcomingVaccines" class="vaccines-container"></div>
+            <button id="hideDataBtn" class="hide-data-btn">
+                <i class="fas fa-eye-slash"></i>
+                إخفاء بيانات المريض
+            </button>
+        </div>
+    </div>
+
+
+
+    <div id="verificationSection" class="verification-section" style="display: none;">
+        <div class="verification-card">
+            <div class="verification-progress">
+                <div class="progress-bar" style="width: 0%"></div>
+            </div>
+            <h2>التحقق من الهوية</h2>
+            <p>السؤال 1 من 2</p>
+            
+            <div class="question-box">
+                <p class="question-text"></p>
+                <div class="options-container">
+                    <!-- سيتم إضافة الخيارات ������ين��ميكياً -->
+                </div>
+            </div>
+            
+            <div id="verificationError" class="error-message" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- زر المستخدمين المحظورين -->
+    <button class="blocked-users-btn" id="blockedUsersBtn" onclick="toggleBlockedUsers()">
+        <i class="fas fa-user-lock"></i>
+        <span class="blocked-users-count" id="blockedCount">0</span>
+        المحظورين
+    </button>
+
+
+
+
+    <script>
+        // تهيئة Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYMRiJQs8vsapzX1bMHTWjrEb-N2ePIPo",
+            authDomain: "mhd-vaxtracker.firebaseapp.com",
+            databaseURL: "https://mhd-vaxtracker-default-rtdb.firebaseio.com",
+            projectId: "mhd-vaxtracker",
+            storageBucket: "mhd-vaxtracker.firebasestorage.app",
+            messagingSenderId: "104907445114",
+            appId: "1:104907445114:web:6110c5cf4e2607ed677cc3",
+            measurementId: "G-RF9SYJ2KCH"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        // جدول التطعيمات
+        const vaccineSchedule = {
+            0: [ // عند الولادة
+            { name: "التطعيم ضد الدرن (BCG)", id: "bcg1" },
+            { name: "التطعيم ضد التهاب الكبد الوبائي ب (الجرعة الأولى)", id: "hepb1" }
+        ],
+        2: [ // شهرن
+            { name: "الطعيم ضد الدفتيريا والتيتانوس والسعال الديكي (الجرعة الأولى)", id: "dtp1" },
+            { name: "التطعيم ضد شلل الأطفال (لجرعة الأولى)", id: "polio1" },
+            { name: "التطعيم ضد المستدمي النزلية (الجرعة الأولى)", id: "hib1" },
+            { name: "التطعيم د التها لكبد الوبائ  (الجرعة الثانية)", id: "hepb2" },
+            { name: "التطعيم ضد التهاب الرئوي (الجرعة الأولى)", id: "pcv1" },
+            { name: "التطعيم ضد فيروس الروتا (الجرعة الأولى)", id: "rota1" }
+        ],
+        4: [ // 4 شهور
+            { name: "التطعيم ضد الدفتيريا والتيتانوس والسعال الديكي (الجرعة الثانية)", id: "dtp2" },
+            { name: "التطعيم ضد شلل الأطفل (الجرعة الثانية)", id: "polio2" },
+            { name: "التطعيم ضد المستدمية النزلية (الجرعة الثانية)", id: "hib2" },
+            { name: "التطعيم ضد التهاب الرئوي (الجرعة الثانية)", id: "pcv2" },
+            { name: "التطعيم ضد فيروس الروتا (الجرعة الثانية)", id: "rota2" }
+        ],
+        6: [ // 6 شهور
+            { name: "التطعيم ضد الدفتيريا والتيتانوس والسعال الديكي (الجرعة الثالثة)", id: "dtp3" },
+            { name: "التطعيم ضد شلل الأطفال (الجرعة الثالثة)", id: "polio3" },
+            { name: "التطعيم ضد المستدمية لنزلية (الجرعة الثالثة)", id: "hib3" },
+            { name: "التطعيم ضد التهاب الرئوي (الجرعة الثالثة)", id: "pcv3" },
+            { name: "التطعيم ضد فيروس الروتا (الجرعة الثالثة)", id: "rota3" }
+        ],
+        12: [ // 12 شهر
+            { name: "الطعيم ضد الحصبة والنكاف والحصبة الألمانية (الجرعة الأولى)", id: "mmr1" },
+            { name: "التطعيم ضد الجدير المائي (الجرعة الأولى)", id: "var1" },
+            { name: "التطعيم ضد التهاب الكبد A (الجرعة الأولى)", id: "hepa1" },
+            { name: "اتطعيم ضد الأنفلونزا", id: "flu1" }
+        ],
+        18: [ // 18 شه
+            { name: "التطعيم ضد الحصة النكاف والحصبة الألمانية (الجرعة الثانية)", id: "mmr2" },
+            { name: "التطعيم ضد الدفتيريا والتيتانوس والسعال الديكي (جرعة تعزيزية)", id: "dtp4" },
+            { name: "التطعيم ضد شلل الأطفال (جرعة تعزيزية)", id: "polio4" }
+        ],
+        24: [ // 24 شهر
+            { name: "التطعيم ضد الأنفلونزا (إذا كان موسمياً)", id: "flu2" },
+            { name: "التطعيم ضد التهاب الكبد A (الجرعة الثانية)", id: "hepa2" }
+        ]
+            // ... باقي اأعمار والتطعيمات
+        };
+
+        // التحقق من وجود جلسة مسجلة
+        //window.onload = function() {
+        //    const userData = localStorage.getItem('userData');
+        //    if (!userData) {
+        //        window.location.href = 'login.html';
+        //    }
+        
+
+        // إضافة متغيرات عامة للتحكم في محاولات التحقق
+        let verificationAttempts = 0;
+        let blockedIds = new Set(JSON.parse(localStorage.getItem('blockedIds') || '[]'));
+        const MAX_ATTEMPTS = 2; // عدد المحاولات المسموحة
+        
+        // تحديث دالة البحث للتحقق من القائمة السوداء
+        async function searchUser() {
+            const nationalId = document.getElementById('nationalId').value.trim();
+            
+            // التحقق من صحة الرقم القومي
+            if (!nationalId) {
+                showError('الرجاء إدخال الرقم القومي');
+                return;
+            }
+
+            if (nationalId.length !== 14 || !/^\d+$/.test(nationalId)) {
+                showError('الرجاء إدخال رقم قومي صحيح مكون من 14 رقم');
+                return;
+            }
+
+            try {
+                startLoading();
+                
+                // الحصول على بيانات الدكتور
+                const doctorData = JSON.parse(localStorage.getItem('doctorData'));
+                if (!doctorData || !doctorData.nationalId) {
+                    throw new Error('لم يتم العثور على بيانات الطبيب');
+                }
+
+                // التحقق من قائمة عدم الحظر
+                const noBlockRef = firebase.database()
+                    .ref(`doctors/${doctorData.nationalId}/noBlockList/${nationalId}`);
+                const noBlockSnapshot = await noBlockRef.once('value');
+                const noBlockData = noBlockSnapshot.val();
+
+                // التحقق من القائمة السوداء فقط إذا لم يكن في قائمة عدم الحظر أو ا��تهت صلاحيتها
+                if (noBlockData && noBlockData.expiryDate > Date.now()) {
+                    // المستخدم في قائمة عدم الحظر وصلاحيته سارية
+                    const userRef = firebase.database().ref(`users/${nationalId}`);
+                    const snapshot = await userRef.once('value');
+                    const userData = snapshot.val();
+
+                    if (!userData) {
+                        showError('لم يتم العثور على هذا المستخدم');
+                        return;
+                    }
+
+                    // عرض البيانات مباشرة بدون تحقق
+                    showUserData(userData);
+                    showNotification('تم العثور على البيانات', 'success');
+                    return;
+                }
+
+                // التحقق من القائمة السوداء
+                if (blockedIds.has(nationalId)) {
+                    showError('عذراً، هذا الرقم القومي محظور من الوصول للبيانات');
+                    return;
+                }
+
+                // البحث في قاعدة البيانات
+                const userRef = firebase.database().ref(`users/${nationalId}`);
+                const snapshot = await userRef.once('value');
+                const userData = snapshot.val();
+
+                if (!userData) {
+                    showError('لم يتم العثور على هذا المستخدم');
+                    return;
+                }
+
+                // إعادة تعيين عداد المحاولات
+                verificationAttempts = 0;
+                showVerification(userData);
+
+            } catch (error) {
+                console.error('خطأ:', error);
+                showError('حدث خطأ في البحث، الرجاء المحاولة مرة أخرى');
+            } finally {
+                stopLoading();
+            }
+        }
+
+        // دالة بدء التحميل
+        function startLoading() {
+            const searchButton = document.getElementById('searchButton');
+            if (!searchButton) return;
+            
+            searchButton.classList.add('loading');
+            searchButton.disabled = true;
+        }
+
+        // دالة إيقاف التحميل
+        function stopLoading() {
+            const searchButton = document.getElementById('searchButton');
+            if (!searchButton) return;
+            
+            searchButton.classList.remove('loading');
+            searchButton.disabled = false;
+        }
+
+        function showSuccess() {
+            const searchButton = document.getElementById('searchButton');
+            const buttonText = searchButton.querySelector('.button-text');
+            const loadingSpan = searchButton.querySelector('.loading-spinner');
+            
+            loadingSpan.style.display = 'none';
+            buttonText.style.opacity = '1';
+            searchButton.classList.remove('loading');
+            searchButton.disabled = false;
+        }
+
+        function showError(message) {
+            const searchError = document.getElementById('searchError');
+            if (!searchError) return;
+
+            // إضافة الأيقونة والرسالة
+            searchError.innerHTML = `
+                <i class="fas fa-exclamation-circle"></i>
+                <span>${message}</span>
+            `;
+
+            // إظهار رسالة الخطأ
+            searchError.classList.add('show');
+            
+            // إضافة تأثير الاهتزاز لحقل البحث
+            const searchInput = document.getElementById('nationalId');
+            if (searchInput) {
+                searchInput.classList.add('shake');
+                // إزالة صنف الاهتزاز بعد انتهاء التأثير
+                setTimeout(() => {
+                    searchInput.classList.remove('shake');
+                }, 500);
+            }
+
+            // إخفاء رسالة الخطأ بعد 4 ثواني
+            setTimeout(() => {
+                searchError.classList.remove('show');
+            }, 4000);
+        }
+
+        async function loadUpcomingVaccines(nationalId, birthDate) {
+            const container = document.getElementById('upcomingVaccines');
+            container.innerHTML = '';
+
+            try {
+                // جلب التطعيمات المكتملة
+                const completedRef = firebase.database().ref(`users/${nationalId}/vaccines`);
+                const completedSnapshot = await completedRef.once('value');
+                const completedVaccines = completedSnapshot.val() || {};
+
+                // حساب عمر ��لطفل بالأشهر
+                const birthDateTime = new Date(birthDate).getTime();
+                const currentTime = new Date().getTime();
+                const ageInMonths = Math.floor((currentTime - birthDateTime) / (30 * 24 * 60 * 60 * 1000));
+
+                // عرض التطعيمات المناسبة للعمر
+                Object.entries(vaccineSchedule).forEach(([months, vaccines]) => {
+                    const monthsNum = parseInt(months);
+                    if (monthsNum >= ageInMonths - 1 && monthsNum <= ageInMonths + 2) {
+                        vaccines.forEach(vaccine => {
+                            if (!completedVaccines[vaccine.id]) {
+                                const card = createVaccineCard(vaccine, nationalId, monthsNum);
+                                container.appendChild(card);
+                            }
+                        });
+                    }
+                });
+
+                if (container.children.length === 0) {
+                    container.innerHTML = '<p>لا توجد تطعيمات مستحقة حالياً</p>';
+                }
+
+            } catch (error) {
+                console.error('خطأ في تحميل التطعيمات:', error);
+                showNotification('حدث خطأ في تحميل التطعيمات', 'error');
+            }
+        }
+
+        function createVaccineCard(vaccine, nationalId, months) {
+            const card = document.createElement('div');
+            card.className = 'vaccine-card';
+            card.setAttribute('data-vaccine-id', vaccine.id);
+            
+            card.innerHTML = `
+                <div class="vaccine-info">
+                    <h3>${vaccine.name}</h3>
+                    <div class="vaccine-date">
+                        <i class="far fa-calendar-alt"></i>
+                        العمر المطلوب: ${months} شهر
+                    </div>
+                </div>
+                <button class="confirm-btn" onclick="confirmVaccine('${vaccine.id}', '${nationalId}')">
+                    <i class="fas fa-syringe"></i>
+                    تأكيد التطعيم
+                </button>
+            `;
+            return card;
+        }
+
+        async function confirmVaccine(vaccineId, nationalId) {
+            try {
+                // الحصول على بيانات الدكتور
+                const doctorData = JSON.parse(localStorage.getItem('doctorData'));
+                if (!doctorData) {
+                    throw new Error('لم يتم العثور على بيانات الطبيب');
+                }
+
+                // إنشاء كائن بيانات التطعيم مع معلومات الدكتور
+                const vaccineData = {
+                    status: 'completed',
+                    date: firebase.database.ServerValue.TIMESTAMP,
+                    doctor: {
+                        name: doctorData.name,
+                        nationalId: doctorData.nationalId,
+                        specialty: doctorData.specialty,
+                        hospital: doctorData.hospital
+                    }
+                };
+
+                // حفظ البيانت في Firebase
+                await firebase.database()
+                    .ref(`users/${nationalId}/vaccines/${vaccineId}`)
+                    .set(vaccineData);
+
+                const card = document.querySelector(`[data-vaccine-id="${vaccineId}"]`);
+                if (card) {
+                    card.style.opacity = '0';
+                    setTimeout(() => card.remove(), 300);
+                }
+
+                showNotification('تم تسجيل التطعيم بنجاح', 'success');
+
+                // إعادة تحميل التطعيمات المتبقية
+                const userData = (await firebase.database().ref(`users/${nationalId}`).once('value')).val();
+                await loadUpcomingVaccines(nationalId, userData.birthdate);
+
+            } catch (error) {
+                console.error('خطأ في تأكيد التطعيم:', error);
+                showNotification('حدث خطأ في تسجيل التطعيم', 'error');
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'block';
+
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        // دالة مساعدة للتحقق من وجود حروف إنجليزية
+        function containsEnglish(str) {
+            return /[a-zA-Z]/.test(str);
+        }
+
+        // دالة مساعدة لأخذ أول اسمين
+        function getFirstTwoNames(fullName) {
+            return fullName.split(' ').slice(0, 2).join(' ');
+        }
+        const firstNames = [
+             // أسماء تقليدية شائعة
+             'أحمد', 'محمد', 'علي', 'حسن', 'مصطفى', 'محمود', 'عمر', 'خالد', 'إبراهيم', 'يوسف',
+             'عبدالله', 'عبدالرحمن', 'طارق', 'ياسر', 'سعيد', 'كريم', 'أيمن', 'سامح', 'هشام', 'وليد',
+    
+            // أسماء عربية تقليدية
+            'زياد', 'عادل', 'فادي', 'ماجد', 'نادر', 'هاني', 'وائل', 'أشرف', 'باسم', 'جمال',
+            'حازم', 'رامي', 'سامي', 'شريف', 'صلاح', 'طلال', 'عصام',  'فراس', 'قاسم',
+    
+            // ��سماء إسلامية
+            'حمزة', 'حسين', 'عثمان', 'عمار', 'فهد', 'مالك', 'مؤمن', 'نور', 'هيثم', 'يحيى',
+            'أنس', 'بلال', 'جاسم', 'حارث', 'خليل',  'زكريا', 'سلطان', 'شهاب', 
+    
+             // أسماء عصرية
+            'آدم', 'أسامة', 'تامر', 'حاتم',  'سيف',  'فارس',
+            'لؤي', 'مازن', 'ناصر', 'هادي', 'ياسين', 'يزن', 'أمير', 'باهر', 'تيم', 'جواد',
+    
+            // أسماء تراثية
+            'راشد', 'سالم', 'شاكر', 'صادق', 'ضياء', 'ظاهر', 'طاهر', 'عارف', 'غازي', 'فاضل',
+            'لبيب', 'ماجد', 'نبيل',  'وسيم', 'ياقوت',  'أوس',
+    
+            // أسماء حديث��
+             'أكرم',  'جابر', 'حكيم', 'خالص', 'رضا', 'زاهر', 'ساري',
+            'شادي', 'صقر', 'ضرار', 'طلعت', 'ظافر', 'عامر', 'غيث', 'فادي', 'قيس', 'كاظم',
+    
+            // أسماء مميزة
+            'لطفي', 'مروان', 'هشام', 'وجدي', 'يزيد',  'باسل', 'توفيق', 'ثروت',
+            'جلال', 'حمدي', 'خيري', 'راغب', 'زهير', 'سمير', 'شوقي', 'صبري', 'ضاحي', 'طارق',
+    
+            // أسماء معاصرة
+            'عاطف', 'غالب', 'فتحي',  'مدحت', 'نشأت', 'هاشم', 
+            'يسري', 'أصيل', 'بدر', 'ثابت', 'حكمت', 'خلدون', 'رأفت' ,
+    
+            // أسماء نادرة
+
+        ];
+        // دالة لتوليد اسم مركب عشوائي
+        function generateRandomCompoundName() {
+
+            let availableNames = [...firstNames];
+            
+            // ختيار الاسم لأول عشوائياً
+            const firstNameIndex = Math.floor(Math.random() * availableNames.length);
+            const firstName = availableNames[firstNameIndex];
+            
+            // إزالة الاسم ��لأول من القائمة المتاحة
+            availableNames.splice(firstNameIndex, 1);
+            
+            // اختيار الاسم الثاني عشوائياً من الأسماء المتبقية
+            const secondNameIndex = Math.floor(Math.random() * availableNames.length);
+            const secondName = availableNames[secondNameIndex];
+            
+            return `${firstName} ${secondName}`;
+        }
+
+        // تحديث دالة generateOptions للأسماء
+        function generateOptions(correctAnswer, type) {
+            if (!correctAnswer) return ['غير متوفر'];
+            
+            let options = [];
+            
+            switch (type) {
+                case 'name':
+                    const isEnglishName = containsEnglish(correctAnswer);
+                    
+                    if (isEnglishName) {
+                        // التعامل مع الأسماء الإنجليزية
+                        const englishNames = [
+                            'John Smith', 'Michael James', 'David Brown', 'James Wilson',
+                            'Robert Taylor', 'William Davis', 'Thomas Moore', 'Joseph Clark',
+                            'Richard Lee', 'Charles Anderson', 'Daniel White', 'Paul Martin'
+                        ];
+                        options = [correctAnswer];
+                        while (options.length < 4) {
+                            const randomName = englishNames[Math.floor(Math.random() * englishNames.length)];
+                            if (!options.includes(randomName)) {
+                                options.push(randomName);
+                            }
+                        }
+
+                    } else {
+                        // توليد أسماء عربية مركبة عشوائية
+                        const usedNames = new Set([correctAnswer]);
+                        options = [correctAnswer];
+                        
+                        // توليد 3 أسماء إضافية مختلفة
+                        while (options.length < 4) {
+                            const randomCompoundName = generateRandomCompoundName();
+                            if (!usedNames.has(randomCompoundName)) {
+                                options.push(randomCompoundName);
+                                usedNames.add(randomCompoundName);
+                            }
+                        }
+                    }
+                    break;
+
+                case 'birthDay':
+                    options = [correctAnswer];
+                    while (options.length < 4) {
+                        let randomDay = Math.floor(Math.random() * 28) + 1;
+                        if (!options.includes(randomDay)) {
+                            options.push(randomDay);
+                        }
+                    }
+                    break;
+
+                case 'birthMonth':
+                    options = [correctAnswer];
+                    while (options.length < 4) {
+                        let randomMonth = Math.floor(Math.random() * 12) + 1;
+                        if (!options.includes(randomMonth)) {
+                            options.push(randomMonth);
+                        }
+                    }
+                    break;
+
+                case 'birthYear':
+                    options = [correctAnswer];
+                    const correctYear = parseInt(correctAnswer);
+                    while (options.length < 4) {
+                        let randomYear = correctYear + Math.floor(Math.random() * 5) - 2;
+                        if (!options.includes(randomYear)) {
+                            options.push(randomYear);
+                        }
+                    }
+                    break;
+            }
+            
+            // خلط الخيارات بشكل عشوائي
+            return shuffleArray(options);
+        }
+
+        // دالة لخلط المصفوفة بشكل عشوائي (Fisher-Yates shuffle)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // دالة للتحقق من صحة الاسم المركب
+        function validateCompoundName(name) {
+            if (!name) return false;
+            
+            const names = name.trim().split(/\s+/);
+            if (names.length !== 2) return false;
+            
+            // التحقق من أن الاسمين مختلفين
+            return names[0] !== names[1];
+        }
+
+        // تحديث دالة التحقق في verificationQuestions
+        const verificationQuestions = [
+            {
+                question: "ما هو اسمك؟",
+                type: "name",
+                validate: (userAnswer, userData) => {
+                    const correctName = getFirstTwoNames(userData.name);
+                    return userAnswer === correctName;
+                }
+            },
+            {
+                question: "ما هو يوم ميلادك؟",
+                type: "birthDay",
+                validate: (userAnswer, userData) => {
+                    const birthDate = new Date(userData.birthdate);
+                    return parseInt(userAnswer) === birthDate.getDate();
+                }
+            },
+            {
+                question: "ما هو شهر ميلادك؟",
+                type: "birthMonth",
+                validate: (userAnswer, userData) => {
+                    const birthDate = new Date(userData.birthdate);
+                    return parseInt(userAnswer) === birthDate.getMonth() + 1;
+                }
+            },
+            {
+                question: "ما هي سنة ميلادك؟",
+                type: "birthYear",
+                validate: (userAnswer, userData) => {
+                    const birthDate = new Date(userData.birthdate);
+                    return parseInt(userAnswer) === birthDate.getFullYear();
+                }
+            }
+        ];
+
+        // دالة لاختيار أسئلة عشوائية
+        function selectRandomQuestions() {
+            const shuffled = [...verificationQuestions].sort(() => Math.random() - 0.5);
+            return shuffled.slice(0, 3); // اختيار 3 أسئلة عشوائية
+        }
+
+        let currentQuestionIndex = 0;
+        let userAnswers = {
+            correct: 0,
+            answers: {}
+        };
+
+        // دالة لعرض نافذة التحقق
+        function showVerification(userData) {
+            if (!userData) {
+                console.error('لم يتم العثور على بيانات المستخدم');
+                showError('حدث خطأ في تحميل البيانات');
+                return;
+            }
+
+            // اختيار 3 أسئلة عشوائية
+            const selectedQuestions = selectRandomQuestions();
+            verificationQuestions.length = 0; // مسح الأسئلة القديمة
+            verificationQuestions.push(...selectedQuestions); // إضافة الأسئلة المختارة
+
+            currentQuestionIndex = 0;
+            userAnswers = {
+                correct: 0,
+                answers: {}
+            };
+            showNextQuestion(userData);
+        }
+
+        // تحديث دالة showNextQuestion لعرض الأسئلة بشكل صحيح
+        function showNextQuestion(userData) {
+            try {
+                const question = verificationQuestions[currentQuestionIndex];
+                let correctAnswer;
+                
+                switch(question.type) {
+                    case 'name':
+                        correctAnswer = getFirstTwoNames(userData.name);
+                        break;
+                    case 'birthDay':
+                        correctAnswer = new Date(userData.birthdate).getDate();
+                        break;
+                    case 'birthMonth':
+                        correctAnswer = new Date(userData.birthdate).getMonth() + 1;
+                        break;
+                    case 'birthYear':
+                        correctAnswer = new Date(userData.birthdate).getFullYear();
+                        break;
+                }
+
+                const options = generateOptions(correctAnswer, question.type);
+                
+                const verificationSection = document.createElement('div');
+                verificationSection.className = 'verification-section';
+                verificationSection.innerHTML = `
+                    <div class="verification-card">
+                        <div class="verification-progress">
+                            <div class="progress-bar" style="width: ${((currentQuestionIndex + 1) * 100) / 3}%"></div>
+                        </div>
+                        <h2>التحقق من الهوية</h2>
+                        <p>السؤال ${currentQuestionIndex + 1} من ${verificationQuestions.length}</p>
+                        
+                        <div class="question-box">
+                            <p class="question-text">${question.question}</p>
+                            <div class="options-container">
+                                ${options.map(option => `
+                                    <button class="option-btn" data-value="${option}">
+                                        ${option}
+                                    </button>
+                                `).join('')}
+                            </div>
+                            <button class="verify-btn" disabled>
+                                <span class="btn-text">تحقق</span>
+                                <span class="btn-loader" style="display: none;">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(verificationSection);
+
+                let selectedAnswer = null;
+                const verifyBtn = verificationSection.querySelector('.verify-btn');
+
+                // إضافة مستمعي الأحداث للخيارات
+                const optionButtons = verificationSection.querySelectorAll('.option-btn');
+                optionButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        optionButtons.forEach(btn => btn.classList.remove('selected'));
+                        button.classList.add('selected');
+                        selectedAnswer = button.dataset.value;
+                        verifyBtn.disabled = false; // تفعيل زر التحقق
+                    });
+                });
+
+                // إضافة مستمع الحدث لزر التحقق
+                verifyBtn.addEventListener('click', async () => {
+                    if (!selectedAnswer) return;
+
+                    // تغيير حالة الزر إلى التحميل
+                    verifyBtn.disabled = true;
+                    verifyBtn.querySelector('.btn-text').style.display = 'none';
+                    verifyBtn.querySelector('.btn-loader').style.display = 'inline-block';
+
+                    // تأخير للتحميل
+                    await new Promise(resolve => setTimeout(resolve, 800));
+
+                    if (currentQuestionIndex === 2) {
+                        await handleThirdQuestion(selectedAnswer, userData);
+                    } else {
+                        await handleAnswer(selectedAnswer, userData);
+                    }
+                });
+
+            } catch (error) {
+                console.error('خطأ في عرض السؤال:', error);
+                showError('حدث خطأ في عرض السؤال');
+            }
+        }
+
+        // دالة للتعامل مع الإجابة
+        async function handleAnswer(answer, userData) {
+            const question = verificationQuestions[currentQuestionIndex];
+            userAnswers.answers[question.type] = answer;
+
+            // تحقق من صحة الإجابة وتخزينها
+            if (question.validate(answer, userData)) {
+                userAnswers.correct++;
+            }
+
+            // إخفاء السؤال الحالي فوراً
+            const currentSection = document.querySelector('.verification-section');
+            currentSection.classList.add('fade-out');
+            
+            // انتظار انت��ا���� تأثير ال��خ������اء
+            await new Promise(resolve => setTimeout(resolve, 300));
+            currentSection.remove();
+
+            // الانتقال للسؤال التالي أو إنهاء التحقق
+            if (currentQuestionIndex < 1) {
+                currentQuestionIndex++;
+                showNextQuestion(userData);
+            } else {
+                // انتهينا من السؤالين الأولين، نتحقق من النتيجة
+                await checkVerificationResult(userData);
+            }
+        }
+
+        // تحديث دالة checkVerificationResult
+        async function checkVerificationResult(userData) {
+            if (userAnswers.correct === 2) {
+                // إجابة صحيحة للسؤالين
+                closeVerification();
+                showSuccessNotification('تم التحقق بنجاح');
+                showUserData(userData);
+            } else if (userAnswers.correct === 1) {
+                // إجابة واحدة صحيحة، عرض السؤال الثالث
+                currentQuestionIndex = 2; // تعيين مؤشر السؤال الثالث
+                showNextQuestion(userData);
+            } else {
+                // إجابتان خاطئتان، إضافة للمحظورين
+                await blockUser(userData.nationalId);
+                closeVerification();
+                showError('تم حظر الوصول لعدم التطابق');
+            }
+        }
+
+        // دالة التعامل مع السؤال الثالث
+        async function handleThirdQuestion(answer, userData) {
+            try {
+                // التحقق من الإجابة
+                const isCorrect = verifyAnswer(answer);
+                
+                // بغض النظر عن صحة الإجابة، قم بإخفاء نافذة التحقق
+                const verificationSection = document.getElementById('verificationSection');
+                if (verificationSection) {
+                    verificationSection.style.display = 'none';
+                }
+
+                // إذا كانت الإجابة صحيحة
+                if (isCorrect) {
+                    showUserData(userData);
+                } else {
+                    handleFailedVerification();
+                }
+
+            } catch (error) {
+                console.error('خطأ في معالجة السؤال الثالث:', error);
+                showError('حدث خطأ أثناء التحقق');
+            }
+        }
+
+        // دالة التحقق من الإجابة
+        function verifyAnswer(answer) {
+            // منطق التحقق من الإجابة
+            return true; // أو false حسب صحة الإجابة
+        }
+
+        // دالة معالجة فشل التحقق
+        function handleFailedVerification() {
+            verificationAttempts++;
+            if (verificationAttempts >= MAX_ATTEMPTS) {
+                blockUser(currentUserData.nationalId);
+            }
+            showError('فشل التحقق. الرجاء المحاولة مرة أخرى');
+        }
+
+        // دالة إظهار بيانات المستخدم
+        function showUserData(userData) {
+            const vaccinesSection = document.getElementById('vaccinesSection');
+            if (vaccinesSection) {
+                vaccinesSection.style.display = 'block';
+                // تحديث بيانات المستخدم وعرضها
+                updateUserDisplay(userData);
+            }
+        }
+
+        // دالة تحديث عرض بيانات المستخدم
+        function updateUserDisplay(userData) {
+            // تحديث العناصر في الصفحة ببيانات المستخدم
+            document.querySelector('#userName span').textContent = userData.name;
+            document.querySelector('#userBirthDate span').textContent = userData.birthdate;
+            // تحديث أي بيانات إضافية
+        }
+
+        // دالة التحقق من السؤال الثالث
+        async function handleThirdQuestion(answer, userData) {
+            const question = verificationQuestions[2];
+            const currentSection = document.querySelector('.verification-section');
+            
+            // إخفاء السؤال الحالي فوراً
+            currentSection.classList.add('fade-out');
+            
+            // انتظار انتهاء تأثير الإخفاء
+            await new Promise(resolve => setTimeout(resolve, 300));
+            currentSection.remove();
+
+            if (question.validate(answer, userData)) {
+                // إجابة صحيحة للسؤال الثالث
+                showSuccessNotification('تم التحقق بنجاح');
+                showUserData(userData);
+            } else {
+                // إجابة خاطئة للسؤال الثالث
+                await blockUser(userData.nationalId);
+                showError('تم حظر الوصول لعدم التطابق');
+            }
+        }
+
+        // دالة إظهار خطأ التحقق
+        function showVerificationError(message) {
+            const errorElement = document.getElementById('verificationError');
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+        }
+
+        // دالة لإخفاء نافذة التحقق
+        function hideVerificationWindow() {
+            const verificationSection = document.getElementById('verificationSection');
+            if (verificationSection) {
+                verificationSection.style.display = 'none';
+                // أو
+                // verificationSection.remove();
+            }
+        }
+
+        // دالة إغلاق نافذة التحقق
+        function closeVerification() {
+            const verificationSection = document.querySelector('.verification-section');
+            if (verificationSection) {
+                verificationSection.classList.add('fade-out');
+                setTimeout(() => {
+                    verificationSection.remove();
+                }, 300);
+            }
+        }
+
+        // دالة إرض بيانات المستخدم
+        function showUserData(userData) {
+            document.querySelector('#userName span').textContent = userData.name;
+            document.querySelector('#userBirthDate span').textContent = formatDate(userData.birthdate);
+            document.getElementById('vaccinesSection').style.display = 'block';
+            loadUpcomingVaccines(userData.nationalId, userData.birthdate);
+        }
+
+        // تحسين دالة إظهار الخطأ
+        function showError(message) {
+            const searchError = document.getElementById('searchError');
+            if (!searchError) return;
+
+            // إضافة الأيقونة والرسالة
+            searchError.innerHTML = `
+                <i class="fas fa-exclamation-circle"></i>
+                <span>${message}</span>
+            `;
+
+            // إظهار رسالة الخطأ
+            searchError.classList.add('show');
+            
+            // إضافة تأثير الاهتزاز لحقل البحث
+            const searchInput = document.getElementById('nationalId');
+            if (searchInput) {
+                searchInput.classList.add('shake');
+                // إزالة صنف الاهتزاز بعد انتهاء التأثير
+                setTimeout(() => {
+                    searchInput.classList.remove('shake');
+                }, 500);
+            }
+
+            // إخفاء رسالة الخطأ بعد 4 ثواني
+            setTimeout(() => {
+                searchError.classList.remove('show');
+            }, 4000);
+        }
+
+        // إضاف ن��ط للاهتزاز
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                75% { transform: translateX(10px); }
+            }
+
+            .shake {
+                animation: shake 0.5s ease-in-out;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // دالة حساب العمر
+        function calculateAge(birthDate) {
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            
+            return age;
+        }
+
+        // دالة إنشاء خيارات عشوائية للعمر
+        function generateAgeOptions(correctAge) {
+            const options = [correctAge];
+            
+            while (options.length < 3) {
+                const randomAge = correctAge + Math.floor(Math.random() * 5) - 2; // عمر عشوائي ±2 سنة
+                if (randomAge > 0 && !options.includes(randomAge)) {
+                    options.push(randomAge);
+                }
+            }
+            
+            // ترتيب الخيارات عشوائياً
+            return options.sort(() => Math.random() - 0.5);
+        }
+
+        // متغيرات عامة
+        let selectedBlockedUser = null;
+
+        // دالة عرض/إخفاء قائمة المحظورين
+        
+
+        // دالة مساعدة لتنسيق التاريخ
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            return new Intl.DateTimeFormat('ar-EG', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            }).format(date);
+        }
+
+        // تحديث نص الإشعار
+        function getNotificationMessage(doctorName, specialty, hospital) {
+            return `الدكتور ${doctorName} (${specialty}) من ${hospital} يطلب إعادة الوصول إلى ملفك الطبي`;
+        }
+
+        // تحسين دالة إظهار الإشارات
+        function showNotification(message, type = 'info') {
+            // إزالة أي إشعارات سابقة
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(notification => notification.remove());
+
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+
+            document.body.appendChild(notification);
+
+            // إضافة تأثير الظهور
+            setTimeout(() => notification.classList.add('show'), 100);
+
+            // إزالة الإشعار بعد 3 ثواني
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // تحديث دالة تحميل بيانات الطبيب
+        async function loadDoctorData() {
+            try {
+                // عرض البيانات المحلية أولاً للسرعة
+                const localDoctorData = JSON.parse(localStorage.getItem('doctorData'));
+                if (!localDoctorData || !localDoctorData.nationalId) {
+                    window.location.href = 'doctor-sign.html';
+                    return;
+                }
+                
+                // عرض البيانات امحلية فوراً
+                displayDoctorInfo(localDoctorData);
+
+                // جلب بيانات الطبيب من Firebase
+                const doctorRef = firebase.database().ref(`doctors/${localDoctorData.nationalId}`);
+                const snapshot = await doctorRef.once('value');
+                const serverDoctorData = snapshot.val();
+
+                if (!serverDoctorData) {
+                    throw new Error('لم يتم العثور على بيانات الطبيب في السيرفر');
+                }
+
+                // مقارنة وتحديث البيانات المحلية إذا كانت مختلفة
+                if (JSON.stringify(localDoctorData) !== JSON.stringify(serverDoctorData)) {
+                    localStorage.setItem('doctorData', JSON.stringify(serverDoctorData));
+                    displayDoctorInfo(serverDoctorData); // تحديث العرض
+                }
+
+                // جلب قائمة المحظوري من السيرفر
+                const blockedRef = firebase.database().ref(`doctors/${localDoctorData.nationalId}/blockedUsers`);
+                const blockedSnapshot = await blockedRef.once('value');
+                const serverBlockedIds = blockedSnapshot.val() || {};
+
+                // جلب المحظوي المحليين
+                const localBlockedIds = new Set(JSON.parse(localStorage.getItem('blockedIds') || '[]'));
+
+                // تحديث قائمة المحظورين المحلية من ��لسيرفر
+                const updatedBlockedIds = new Set([...Object.keys(serverBlockedIds)]);
+                
+                // تحديث التخزين المحلي إذا كان هناك اختلاف
+                if (JSON.stringify([...localBlockedIds]) !== JSON.stringify([...updatedBlockedIds])) {
+                    localStorage.setItem('blockedIds', JSON.stringify([...updatedBlockedIds]));
+                    blockedIds = updatedBlockedIds; // تحديث المتغير العام
+                }
+
+            } catch (error) {
+                console.error('خطأ في تحميل البيانات:', error);
+                showNotification('حدث خطأ في تحميل البيانات', 'error');
+            }
+        }
+
+        // تحديث دالة حظر المستخدم
+        async function blockUser(nationalId) {
+            try {
+                const doctorData = JSON.parse(localStorage.getItem('doctorData'));
+                if (!doctorData || !doctorData.nationalId) {
+                    throw new Error('لم يتم العثور على بيانات اطبيب');
+                }
+
+                // إضافة المستخدم للمحظورين في Firebase أولاً
+                await firebase.database()
+                    .ref(`doctors/${doctorData.nationalId}/blockedUsers/${nationalId}`)
+                    .set({
+                        timestamp: firebase.database.ServerValue.TIMESTAMP,
+                        status: 'blocked'
+                    });
+
+                // بعد نجاح الإضافة في Firebase، نقوم بالتحديث محلياً
+                blockedIds.add(nationalId);
+                localStorage.setItem('blockedIds', JSON.stringify([...blockedIds]));
+
+                showNotification('تم حظر المستخدم بنجاح', 'error');
+                
+                // تحديث عرض المحظورين
+                await loadBlockedUsers();
+                
+            } catch (error) {
+                console.error('خطأ في حظر المستخدم:', error);
+                showNotification('حدث خطأ في حظر المستخدم', 'error');
+            }
+        }
+
+        // دالة عرض بيانات الطبيب في الصفحة
+        function displayDoctorInfo(doctorData) {
+            // إزالة أي قسم معلوما�� طبيب موجود مسبقاً
+            const existingInfo = document.querySelector('.doctor-info-section');
+            if (existingInfo) {
+                existingInfo.remove();
+            }
+
+            // إنشاء عنصر معلومات الطبيب
+            const doctorInfo = document.createElement('div');
+            doctorInfo.className = 'doctor-info-section';
+            doctorInfo.innerHTML = `
+                <div class="doctor-header">
+                    <div class="doctor-avatar">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <div class="doctor-details">
+                        <h2>د. ${doctorData.name}</h2>
+                        <p class="specialty">
+                            <i class="fas fa-stethoscope"></i>
+                            ${doctorData.specialty}
+                        </p>
+                        <p class="hospital">
+                            <i class="fas fa-hospital"></i>
+                            ${doctorData.hospital}
+                        </p>
+                    </div>
+                </div>
+                <div class="notification-container">
+                    <button class="chat-button" onclick="location.href='doctor-notifications.html'">
+                        <i class="fas fa-bell"></i>
+                        الإشعارات
+                    </button>
+                    <button class="chat-button" onclick="location.href='doctor-chats.html'">
+                        <i class="fas fa-comments"></i>
+                        المحادثات
+                    </button>
+                </div>
+            `;
+
+            // العثور على العنوان الرئيسي
+            const mainTitle = document.querySelector('.main-title');
+            
+            // إدراج معلومات الطبيب بعد العنوان مباشرة
+            if (mainTitle) {
+                mainTitle.insertAdjacentElement('afterend', doctorInfo);
+            } else {
+                // إذا لم يتم العثور على العنوان، أضف في بدية الحاوية
+                const container = document.querySelector('.container');
+                container.insertBefore(doctorInfo, container.firstChild);
+            }
+        }
+
+        function checkAuth() {
+            const doctorData = JSON.parse(localStorage.getItem('doctorData'));
+            if (!doctorData || !doctorData.nationalId) {
+                window.location.href = 'doctor-sign.html';
+                return false;
+            }
+            return true;
+        }
+
+        // إضافة دالة لتنظيف قائمة عدم الحظر المنتهية الصلاحية
+        async function cleanupExpiredNoBlockList() {
+            try {
+                const doctorData = JSON.parse(localStorage.getItem('doctorData'));
+                if (!doctorData || !doctorData.nationalId) return;
+
+                const noBlockRef = firebase.database()
+                    .ref(`doctors/${doctorData.nationalId}/noBlockList`);
+                const snapshot = await noBlockRef.once('value');
+                const noBlockList = snapshot.val() || {};
+
+                const currentTime = Date.now();
+                const updates = {};
+
+                // تحديد العناصر المنتهية الصلاحية
+                Object.entries(noBlockList).forEach(([userId, data]) => {
+                    if (data.expiryDate <= currentTime) {
+                        updates[userId] = null; // حذف العنصر
+                    }
+                });
+
+                // تطبيق التحديثات إذ وجدت
+                if (Object.keys(updates).length > 0) {
+                    await noBlockRef.update(updates);
+                }
+            } catch (error) {
+                console.error('خطأ في تنظيف قائمة عدم الحظر:', error);
+            }
+        }
+
+        // تحديث window.onload
+        window.onload = async function() {
+            if (!checkAuth()) return;
+            await loadDoctorData();
+            await cleanupExpiredNoBlockList(); // تنظيف القائمة عند تحميل الصفحة
+        };
+
+        // تحديث دالة showSuccessNotification
+        function showSuccessNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'success-notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 2000);
+        }
+
+        // دالة تحديث نموذج البحث
+        function updateSearchForm() {
+            const searchForm = document.querySelector('.search-form');
+            if (!searchForm) return;
+
+            const searchInput = searchForm.querySelector('.search-input');
+            const searchButton = searchForm.querySelector('.search-btn');
+            const searchError = searchForm.querySelector('.search-error');
+
+            // إعادة تعيين حقل البحث
+            if (searchInput) {
+                searchInput.value = '';
+                searchInput.classList.remove('error');
+            }
+
+            // إعادة تعيين زر البحث
+            if (searchButton) {
+                searchButton.classList.remove('loading');
+                searchButton.disabled = false;
+            }
+
+            // إزالة رسائل الخطأ
+            if (searchError) {
+                searchError.remove();
+            }
+        }
+
+        // دالة البحث عن المستخدم
+        async function handleSearch(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const input = form.querySelector('.search-input');
+            const button = form.querySelector('.search-btn');
+            const nationalId = input.value.trim();
+
+            // إزالة رسائل الخطأ السابقة
+            const oldError = form.parentElement.querySelector('.search-error');
+            if (oldError) oldError.remove();
+            input.classList.remove('error');
+
+            try {
+                // التحقق من صحة الرقم القومي
+                if (!/^[0-9]{14}$/.test(nationalId)) {
+                    throw new Error('الرجاء إدخال رقم قومي صحيح مكون من 14 رقم');
+                }
+
+                // تغيير حالة ال��ر إلى حالة التحميل
+                button.classList.add('loading');
+                button.disabled = true;
+
+                // التحقق من قائمة المحظورين في Firebase
+                const doctorData = JSON.parse(localStorage.getItem('doctorData'));
+                if (!doctorData || !doctorData.nationalId) {
+                    throw new Error('لم يتم العثور على بيانات الطبيب');
+                }
+
+                const blockedRef = firebase.database()
+                    .ref(`doctors/${doctorData.nationalId}/blockedUsers/${nationalId}`);
+                const blockedSnapshot = await blockedRef.once('value');
+                
+                if (blockedSnapshot.exists()) {
+                    throw new Error('هذا المستخدم محظور. يمكنك طلب إعادة الوصول من قائمة المحظورين');
+                }
+
+                // البحث عن المستخدم في قاعدة البيانات
+                const userRef = firebase.database().ref(`users/${nationalId}`);
+                const userSnapshot = await userRef.once('value');
+                const userData = userSnapshot.val();
+
+                if (userData) {
+                    showVerification(userData);
+                    updateSearchForm(); // تحديث النموذج بعد نجاح البحث
+                } else {
+                    throw new Error('لم يتم العثور على بيانات لهذا الرقم القومي');
+                }
+
+            } catch (error) {
+                // إظهار رسالة الخطأ
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'search-error';
+                
+                if (error.message.includes('محظور')) {
+                    errorDiv.className = 'search-error blocked-error';
+                    errorDiv.innerHTML = `
+                        <div class="error-content">
+                            <i class="fas fa-user-lock"></i>
+                            <div class="error-text">
+                                <strong>مستخدم محظور</strong>
+                                <p>${error.message}</p>
+                            </div>
+                        </div>
+                        <button onclick="openBlockedUsersPage()" class="view-blocked-btn">
+                            <i class="fas fa-list"></i>
+                            عرض المحظورين
+                        </button>
+                    `;
+                } else {
+                    errorDiv.innerHTML = `
+                        <i class="fas fa-exclamation-circle"></i>
+                        ${error.message}
+                    `;
+                }
+                
+                form.parentElement.appendChild(errorDiv);
+                input.classList.add('error');
+                
+            } finally {
+                // إعادة الزر إلى حالته الطبيعية
+                button.classList.remove('loading');      
+                button.disabled = false;
+            }
+        }
+
+        // دالة فتح صفحة المستخدمين المحظورين
+        function openBlockedUsersPage() {
+            window.location.href = 'blocked-users.html';
+        }
+
+        // تنفيذ عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', () => {
+            checkBlockedUsers();
+            // إضافة مستمع لنموذج البحث
+            const searchForm = document.querySelector('.search-form');
+            if (searchForm) {
+                searchForm.addEventListener('submit', handleSearch);
+            }
+        });
+
+        // دالة للتحقق من وجود مستخدمين محظورين وإظهار الزر
+        function checkBlockedUsers() {
+            const blockedUsers = JSON.parse(localStorage.getItem('blockedIds') || '[]');
+            const blockedUsersBtn = document.getElementById('blockedUsersBtn');
+
+            if (blockedUsers.length > 0) {
+                blockedUsersBtn.style.display = 'flex'; // إظهار الزر إذا كان هناك مستخدمون محظورون
+            } else {
+                blockedUsersBtn.style.display = 'none'; // إخفاء الزر إذا لم يكن هناك مستخدمون محظورون
+            }
+        }
+
+        // استدعاء الدالة عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', checkBlockedUsers);
+
+        // دالة للتحقق من المستخدمين المحظورين
+        async function checkBlockedUsers() {
+            try {
+                const doctorData = JSON.parse(localStorage.getItem('doctorData'));
+                if (!doctorData || !doctorData.nationalId) {
+                    console.log('لم يتم العثور على بيانات الطبيب');
+                    return;
+                }
+
+                // الوصول لقائمة المحظورين من Firebase
+                const blockedRef = firebase.database().ref(`doctors/${doctorData.nationalId}/blockedUsers`);
+                const snapshot = await blockedRef.once('value');
+                const blockedUsers = snapshot.val();
+
+                const blockedUsersBtn = document.getElementById('blockedUsersBtn');
+                const blockedCountElement = document.getElementById('blockedCount');
+
+                if (blockedUsers) {
+                    const blockedCount = Object.keys(blockedUsers).length;
+                    console.log('عدد المحظورين:', blockedCount);
+
+                    // تحديث الزر
+                    if (blockedCount > 0) {
+                        blockedUsersBtn.style.display = 'flex';
+                        blockedCountElement.textContent = blockedCount;
+                    } else {
+                        blockedUsersBtn.style.display = 'none';
+                    }
+                } else {
+                    blockedUsersBtn.style.display = 'none';
+                }
+
+            } catch (error) {
+                console.error('خطأ في التحقق من المستخدمين المحظورين:', error);
+            }
+        }
+
+        // تنفيذ عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', () => {
+            checkBlockedUsers();
+        });
+
+        // دالة إظهار/إخفاء قائمة المحظورين
+        function toggleBlockedUsers() {
+            // يمكنك إضافة كود عرض قائمة المحظورين هنا
+            console.log('تم الضغط على زر المحظورين');
+        }
+
+        // دالة لفتح صفحة المستخدمين المحظورين
+        function toggleBlockedUsers() {
+            // يمكنك فتح صفحة جديدة
+            window.location.href = 'blocked-users.html';
+
+            // أو يمكنك فتح نافذة منبثقة
+            // window.open('blocked-users.html', '_blank', 'width=600,height=400');
+        }
+
+        // دالة للتحقق من الإجابة وإخفاء النافذة
+        function verifyAndHideWindow() {
+            // تحقق من الإجابة هنا
+            // إذا كانت الإجابة صحيحة، قم بإخفاء النافذة
+            const verificationSection = document.querySelector('.verification-section');
+            if (verificationSection) {
+                verificationSection.remove(); // إزالة النافذة من DOM
+            }
+        }
+
+        // تنفيذ عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', () => {
+            // إضافة مستمع للزر للتحقق من الإجابة
+            const verifyButton = document.querySelector('.verify-btn');
+            if (verifyButton) {
+                verifyButton.addEventListener('click', verifyAndHideWindow);
+            }
+        });
+
+        // دالة لإخفاء بيانات المريض
+        function hidePatientData() {
+            const vaccinesSection = document.getElementById('vaccinesSection');
+            const searchInput = document.getElementById('nationalId');
+            
+            if (vaccinesSection) {
+                // إخفاء قسم البيانات
+                vaccinesSection.style.display = 'none';
+                
+                // مسح حقل البحث
+                if (searchInput) {
+                    searchInput.value = '';
+                }
+                
+                // إظهار رسالة تأكيد
+                showNotification('تم إخفاء بيانات المريض', 'success');
+            }
+        }
+
+        // إضافة مستمع الحدث للزر عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', () => {
+            const hideDataBtn = document.getElementById('hideDataBtn');
+            if (hideDataBtn) {
+                hideDataBtn.addEventListener('click', hidePatientData);
+            }
+        });
+
+        // تحديث دالة showUserData لتأكد من ظهور الزر
+        function showUserData(userData) {
+            const vaccinesSection = document.getElementById('vaccinesSection');
+            const userName = document.getElementById('userName');
+            const userBirthDate = document.getElementById('userBirthDate');
+            const hideDataBtn = document.getElementById('hideDataBtn');
+
+            if (vaccinesSection && userName && userBirthDate) {
+                // عرض البيانات
+                vaccinesSection.style.display = 'block';
+                userName.querySelector('span').textContent = userData.name;
+                userBirthDate.querySelector('span').textContent = formatDate(userData.birthdate);
+
+                // التأكد من ظهور زر الإخفاء
+                if (hideDataBtn) {
+                    hideDataBtn.style.display = 'flex';
+                }
+
+                // تحميل التطعيمات المستحقة
+                loadUpcomingVaccines(userData.nationalId, userData.birthdate);
+            }
+        }
+
+        // دالة لعرض الإشعارات
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // إخفاء الإشعار بعد 3 ثواني
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html> 
