@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <link rel="icon" type="image/x-icon" href="https://www2.0zz0.com/2024/11/17/11/646664920.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل حساب طبيب - نظام التطعيمات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #2ecc71;
+            --warning-color: #f1c40f;
+            --background-color: #f8fafc;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background: var(--background-color);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(44, 62, 80, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(52, 152, 219, 0.1) 0%, transparent 20%);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .logo i {
+            color: var(--primary-color);
+            font-size: 3.5em;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 1.8em;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .input-wrapper {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            transition: color 0.3s ease;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            padding-right: 45px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: var(--background-color);
+        }
+
+        input:focus {
+            border-color: var(--secondary-color);
+            background: white;
+            box-shadow: 0 0 0 5px rgba(52, 152, 219, 0.1);
+            outline: none;
+        }
+
+        input:focus + i {
+            color: var(--secondary-color);
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+
+        .login-link a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .login-link a:hover {
+            color: var(--primary-color);
+        }
+
+        .error-message {
+            margin-top: 8px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            background-color: rgba(231, 76, 60, 0.1);
+            border-right: 3px solid var(--accent-color);
+            color: var(--accent-color);
+            font-weight: 600;
+            display: none;
+            animation: slideIn 0.3s ease;
+            font-size: 1.1em;
+        }
+
+        .error-message a {
+            display: inline-block;
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1em;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+
+
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* تحسينات للشاشات الصغيرة */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            input {
+                font-size: 14px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+        }
+
+        /* أنماط حالة التحميل */
+        .loading-state {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .loading-state .button-content {
+            opacity: 0;
+        }
+
+        .loading-state .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+        }
+
+        .loading-spinner i {
+            animation: spin 1s infinite linear;
+        }
+
+        button.success {
+            background: linear-gradient(135deg, var(--success-color), #27ae60) !important;
+        }
+
+        button.error {
+            background: linear-gradient(135deg, var(--accent-color), #c0392b) !important;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* أنماط حالات الزر */
+        button {
+            transition: all 0.3s ease !important;
+        }
+
+        button.success {
+            background: linear-gradient(135deg, var(--success-color), #27ae60) !important;
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3) !important;
+        }
+
+        button.error {
+            background: linear-gradient(135deg, var(--accent-color), #c0392b) !important;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3) !important;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* تحسين شكل رسالة الخطأ */
+        .error-message {
+            margin-top: 8px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            background-color: rgba(231, 76, 60, 0.1);
+            border-right: 3px solid var(--accent-color);
+            color: var(--accent-color);
+            font-weight: 600;
+            display: none;
+            animation: slideIn 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .specialty-select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 16px;
+            background: var(--background-color);
+            transition: var(--transition);
+        }
+
+
+
+        .hospital-info {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <i class="fas fa-user-md"></i>
+            <h1>تسجيل حساب طبيب جديد</h1>
+        </div>
+
+        <form id="doctorRegistrationForm" onsubmit="handleSubmit(event)">
+            <div class="form-group">
+                <label for="name">الاسم الكامل</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user-md"></i>
+                    <input type="text" id="name" required>
+                </div>
+                <div class="error-message" id="nameError">يرجى إدخال الاسم الكامل</div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">البريد الإلكتروني</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="error-message" id="emailError">يرجى إدخال بريد إلكتروني صحيح</div>
+            </div>
+
+            <div class="form-group">
+                <label for="nationalId">الرقم القومي</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-id-card"></i>
+                    <input type="text" id="nationalId" maxlength="14" required>
+                </div>
+                <div class="error-message" id="idError">يرجى إدخال رقم قومي صحيح</div>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">رقم الهاتف</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-phone"></i>
+                    <input type="tel" id="phone" required>
+                </div>
+                <div class="error-message" id="phoneError">يرجى إدخال رقم هاتف صحيح</div>
+            </div>
+
+            <div class="form-group">
+                <label for="licenseNumber">رقم الترخيص المهني</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-certificate"></i>
+                    <input type="text" id="licenseNumber" required>
+                </div>
+                <div class="error-message" id="licenseError">يرجى إدخال رقم ترخيص صحيح</div>
+            </div>
+
+            <div class="form-group">
+                <label for="specialty">التخصص</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-stethoscope"></i>
+                    <select id="specialty" class="specialty-select" required>
+                        <option value="">اختر التخصص</option>
+                        <option value="pediatrics">طب الأطفال</option>
+                        <option value="family">طب الأسرة</option>
+                        <option value="internal">الطب الباطني</option>
+                        <option value="general">طب عام</option>
+                    </select>
+                </div>
+                <div class="error-message" id="specialtyError">يرجى اختيار التخصص</div>
+            </div>
+
+            <div class="form-group">
+                <label for="hospital">مكان العمل</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-hospital"></i>
+                    <input type="text" id="hospital" required>
+                </div>
+                <div class="error-message" id="hospitalError">يرجى إدخال مكان العمل</div>
+            </div>
+
+            <button type="submit" id="submitButton">
+                <span class="button-content">
+                    <i class="fas fa-user-md"></i>
+                    تسجيل حساب طبيب
+                </span>
+                <span class="loading-spinner" style="display: none;">
+                    <i class="fas fa-spinner"></i>
+                    جاري انشاء الحساب...
+                </span>
+            </button>
+
+            <div class="login-link">
+                لديك حساب بالفعل؟ <a href="doctor-login.html">تسجيل الدخول</a>
+            </div>
+        </form>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYMRiJQs8vsapzX1bMHTWjrEb-N2ePIPo",
+            authDomain: "mhd-vaxtracker.firebaseapp.com",
+            databaseURL: "https://mhd-vaxtracker-default-rtdb.firebaseio.com",
+            projectId: "mhd-vaxtracker",
+            storageBucket: "mhd-vaxtracker.firebasestorage.app",
+            messagingSenderId: "104907445114",
+            appId: "1:104907445114:web:6110c5cf4e2607ed677cc3",
+            measurementId: "G-RF9SYJ2KCH"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        window.handleSubmit = async function(event) {
+            event.preventDefault();
+            
+            if (!validateForm()) {
+                return;
+            }
+
+            const nationalId = document.getElementById('nationalId').value;
+            const submitButton = document.getElementById('submitButton');
+            const buttonContent = submitButton.querySelector('.button-content');
+            const loadingSpinner = submitButton.querySelector('.loading-spinner');
+
+            startLoading(submitButton, buttonContent, loadingSpinner);
+
+            try {
+                // التحقق من وجود الطبيب
+                const doctorRef = ref(database, 'doctors/' + nationalId);
+                const snapshot = await get(doctorRef);
+
+                if (snapshot.exists()) {
+                    throw new Error('الرقم القومي مسجل بالفعل');
+                }
+
+                // تجميع بيانات الطبيب
+                const doctorData = {
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    nationalId: nationalId,
+                    phone: document.getElementById('phone').value,
+                    licenseNumber: document.getElementById('licenseNumber').value,
+                    specialty: document.getElementById('specialty').value,
+                    hospital: document.getElementById('hospital').value,
+                    role: 'doctor',
+                    status: 'pending', // يمكن استخدامه للتحقق من الحساب
+                    timestamp: new Date().toISOString()
+                };
+
+                // حفظ البيانات في Firebase
+                await set(doctorRef, doctorData);
+                
+                // حفظ البيانات محلياً
+                localStorage.setItem('doctorId', nationalId);
+                localStorage.setItem('doctorData', JSON.stringify(doctorData));
+                
+                showSuccess(submitButton, buttonContent, loadingSpinner);
+                
+                // الانتقال إلى صفحة لوحة تكم الطبيب
+                setTimeout(() => {
+                    window.location.href = 'medical-center.html';
+                }, 1500);
+                
+            } catch (error) {
+                console.error("خطأ في حفظ البيانات:", error);
+                // تحديث طريقة عرض رسالة الخطأ
+                const errorMessage = error.message || 'حدث خطأ أثناء التسجيل';
+                showError(submitButton, buttonContent, loadingSpinner, errorMessage);
+                
+                // إعادة تفعيل الزر بعد فترة
+                setTimeout(() => {
+                    submitButton.disabled = false;
+                    submitButton.classList.remove('error');
+                    buttonContent.innerHTML = '<i class="fas fa-user-md"></i> تسجيل حساب طبيب';
+                }, 3000);
+            }
+        }
+
+        // نفس الدوال المساعدة السابقة
+        function startLoading(button, content, spinner) {
+            button.classList.add('loading-state');
+            content.style.opacity = '0';
+            spinner.style.display = 'flex';
+            button.disabled = true;
+        }
+
+        function showSuccess(button, content, spinner) {
+            button.classList.remove('loading-state');
+            button.classList.add('success');
+            spinner.style.display = 'none';
+            content.style.opacity = '1';
+            content.innerHTML = '<i class="fas fa-check"></i> تم انشاء الحساب بنجاح';
+        }
+
+        function showError(button, content, spinner, message) {
+            button.classList.remove('loading-state');
+            button.classList.add('error');
+            spinner.style.display = 'none';
+            content.style.opacity = '1';
+            content.innerHTML = '<i class="fas fa-times"></i> ' + message;
+            
+            // عرض رسالة الخطأ في جميع حقول الخطأ
+            const errorElements = document.querySelectorAll('.error-message');
+            errorElements.forEach(element => {
+                element.style.display = 'none';
+            });
+            
+            // عرض الرسالة في حقل الخطأ المناسب
+            const idError = document.getElementById('idError');
+            if (message.includes('الرقم القومي مسجل بالفعل')) {
+                idError.innerHTML = `
+                    <span>${message}</span>
+                    <a href="doctor-login.html" style="display: inline-block; color: var(--secondary-color); margin-right: 10px; text-decoration: none; font-weight: 700; font-size: 1.1em; padding: 5px 10px; border-radius: 5px; transition: all 0.3s ease;">تسجيل الدخول</a>
+                `;
+                idError.style.display = 'block';
+            } else {
+                idError.textContent = message;
+                idError.style.display = 'block';
+            }
+        }
+    </script>
+
+    <script>
+        function validateForm() {
+            let isValid = true;
+            const button = document.getElementById('submitButton');
+            
+            // التحقق من الاسم
+            const name = document.getElementById('name').value;
+            if (name.length < 3) {
+                document.getElementById('nameError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('nameError').style.display = 'none';
+            }
+
+            // التحقق من البريد الإلكتروني
+            const email = document.getElementById('email').value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                document.getElementById('emailError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('emailError').style.display = 'none';
+            }
+
+            // التحقق من الرقم القومي
+            const nationalId = document.getElementById('nationalId').value;
+            if (nationalId.length !== 14) {
+                document.getElementById('idError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('idError').style.display = 'none';
+            }
+
+            // التحقق من رقم الهاتف
+            const phone = document.getElementById('phone').value;
+            if (phone.length < 11) {
+                document.getElementById('phoneError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('phoneError').style.display = 'none';
+            }
+
+            // التحقق من رقم الترخيص
+            const license = document.getElementById('licenseNumber').value;
+            if (license.length < 5) {
+                document.getElementById('licenseError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('licenseError').style.display = 'none';
+            }
+
+            // التحقق من التخصص
+            const specialty = document.getElementById('specialty').value;
+            if (!specialty) {
+                document.getElementById('specialtyError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('specialtyError').style.display = 'none';
+            }
+
+            // التحقق من مكان العمل
+            const hospital = document.getElementById('hospital').value;
+            if (hospital.length < 3) {
+                document.getElementById('hospitalError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('hospitalError').style.display = 'none';
+            }
+
+            if (!isValid) {
+                button.classList.add('error');
+                setTimeout(() => {
+                    button.classList.remove('error');
+                }, 500);
+            }
+
+            return isValid;
+        }
+        window.onload = function() {
+            const doctorData = localStorage.getItem('doctorData');
+            if (doctorData) {
+                window.location.href = 'medical-center.html';
+            }
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    
+    <link rel="icon" type="image/x-icon" href="https://www2.0zz0.com/2024/11/17/11/646664920.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المستخدمين المحظورين - نظام التطعيمات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #3b82f6;
+            --accent-color: #f43f5e;
+            --success-color: #22c55e;
+            --background-color: #f1f5f9;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --gradient-primary: linear-gradient(135deg, #2563eb, #3b82f6);
+            --gradient-hover: linear-gradient(135deg, #1d4ed8, #2563eb);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--background-color);
+            min-height: 100vh;
+            padding: 20px;
+            background-image: 
+                radial-gradient(at 40% 20%, rgba(37, 99, 235, 0.1) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, rgba(37, 99, 235, 0.1) 0px, transparent 50%);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
+            backdrop-filter: blur(10px);
+            transform: translateY(0);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 0.5rem;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin: 0;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .back-btn {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 300;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+
+
+        .blocked-user-card {
+            padding: 25px;
+            margin: 20px 0;
+            border: none;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .blocked-user-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 0 20px 20px 0;
+        }
+
+
+
+        .user-info {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .user-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-name i {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.1rem;
+        }
+
+        .user-id {
+            color: #64748b;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .user-id i {
+            color: var(--secondary-color);
+            opacity: 0.8;
+        }
+
+        .request-btn {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .request-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .request-btn:hover::before {
+            transform: translateX(100%);
+        }
+
+        .request-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2);
+        }
+
+        /* تحسينات للموبايل */
+        @media (max-width: 768px) {
+            .blocked-user-card {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+                padding: 20px;
+            }
+
+            .user-name {
+                font-size: 1.1rem;
+            }
+
+            .user-id {
+                font-size: 0.9rem;
+            }
+
+            .request-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* حالة عدم وجود مستخدمين */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+        }
+
+        /* تصميم المودال */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 24px;
+            overflow: hidden;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal.show .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--gradient-primary);
+        }
+
+        .modal-header h3 {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            resize: none;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            min-height: 120px;
+        }
+
+        .form-group textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .char-count {
+            display: block;
+            text-align: left;
+            color: #64748b;
+            margin-top: 8px;
+            font-size: 0.9rem;
+        }
+
+        .modal-footer {
+            padding: 20px 25px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .cancel-btn, .send-btn {
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .cancel-btn {
+            background: #f1f5f9;
+            color: #64748b;
+            border: none;
+        }
+
+        .cancel-btn:hover {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .send-btn {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+        }
+
+        .send-btn:hover {
+            background: var(--gradient-hover);
+            transform: translateY(-2px);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-loader {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* تحسينات للموبايل */
+        @media (max-width: 768px) {
+            .modal-content {
+                margin: 10px;
+            }
+
+            .modal-header h3 {
+                font-size: 1.2rem;
+            }
+
+            .modal-body {
+                padding: 20px;
+            }
+
+            .modal-footer {
+                padding: 15px 20px;
+                flex-direction: column;
+            }
+
+            .cancel-btn, .send-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* تصميم الإشعارات */
+        .notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 16px 24px;
+            border-radius: 16px;
+            background: white;
+            color: #1e293b;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            min-width: 300px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .notification::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 100%;
+            border-radius: 0 16px 16px 0;
+        }
+
+        .notification.success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: #166534;
+        }
+
+        .notification.success::before {
+            background: var(--success-color);
+        }
+
+        .notification.error {
+            background: rgba(244, 63, 94, 0.1);
+            border: 1px solid rgba(244, 63, 94, 0.2);
+            color: #be123c;
+        }
+
+        .notification.error::before {
+            background: var(--accent-color);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .notification i {
+            font-size: 1.2rem;
+        }
+
+        .notification.success i {
+            color: var(--success-color);
+        }
+
+        .notification.error i {
+            color: var(--accent-color);
+        }
+
+        /* تحسينات للموبايل */
+        @media (max-width: 768px) {
+            .notification {
+                bottom: 20px;
+                right: 20px;
+                left: 20px;
+                min-width: unset;
+                padding: 14px 20px;
+            }
+        }
+
+        /* تحريك الإشعار */
+        @keyframes slideIn {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>المستخدمين المحظورين</h1>
+            <button onclick="location.href='medical-center.html'" class="back-btn">
+                <i class="fas fa-arrow-right"></i>
+                العودة
+            </button>
+        </div>
+        <div id="blockedUsersList">
+            <!-- سيتم ملء هذا القسم ديناميكياً -->
+        </div>
+    </div>
+
+    <script>
+        // تهيئة Firebase (نفس التهيئة الموجودة في الصفحة الرئيسية)
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYMRiJQs8vsapzX1bMHTWjrEb-N2ePIPo",
+            authDomain: "mhd-vaxtracker.firebaseapp.com",
+            databaseURL: "https://mhd-vaxtracker-default-rtdb.firebaseio.com",
+            projectId: "mhd-vaxtracker",
+            storageBucket: "mhd-vaxtracker.firebasestorage.app",
+            messagingSenderId: "104907445114",
+            appId: "1:104907445114:web:6110c5cf4e2607ed677cc3",
+            measurementId: "G-RF9SYJ2KCH"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        // تحميل المستخدمين المحظورين عند تحميل الصفحة
+        window.onload = async function() {
+            if (!checkAuth()) return;
+            await loadBlockedUsers();
+        };
+
+        // دالة التحقق من تسجيل الدخول
+        function checkAuth() {
+            const doctorData = JSON.parse(localStorage.getItem('doctorData'));
+            if (!doctorData || !doctorData.nationalId) {
+                window.location.href = 'doctor-sign.html';
+                return false;
+            }
+            return true;
+        }
+
+        // دالة تحميل المستخدمين المحظورين
+        async function loadBlockedUsers() {
+            const blockedUsersList = document.getElementById('blockedUsersList');
+            blockedUsersList.innerHTML = '<div class="empty-state">جاري تحميل البيانات...</div>';
+
+            try {
+                const doctorData = JSON.parse(localStorage.getItem('doctorData'));
+                const blockedRef = firebase.database()
+                    .ref(`doctors/${doctorData.nationalId}/blockedUsers`);
+                const snapshot = await blockedRef.once('value');
+                const blockedUsers = snapshot.val() || {};
+
+                blockedUsersList.innerHTML = '';
+                
+                for (const userId in blockedUsers) {
+                    const userRef = firebase.database().ref(`users/${userId}`);
+                    const userSnapshot = await userRef.once('value');
+                    const userData = userSnapshot.val();
+
+                    if (userData) {
+                        const card = createBlockedUserCard(userData);
+                        blockedUsersList.appendChild(card);
+                    }
+                }
+
+                if (blockedUsersList.children.length === 0) {
+                    blockedUsersList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-users-slash"></i>
+                            <p>لا يوجد مستخدمين محظورين</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('خطأ:', error);
+                blockedUsersList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>حدث خطأ في تحميل البيانات</p>
+                    </div>
+                `;
+            }
+        }
+
+        // دالة إنشاء بطاقة المستخدم المحظور
+        function createBlockedUserCard(userData) {
+            const card = document.createElement('div');
+            card.className = 'blocked-user-card';
+            
+            card.innerHTML = `
+                <div class="user-info">
+                    <div class="user-name">
+                        <i class="fas fa-user"></i>
+                        ${userData.name}
+                    </div>
+                    <div class="user-id">
+                        <i class="fas fa-id-card"></i>
+                        الرقم القومي: ${userData.nationalId}
+                    </div>
+                </div>
+                <button onclick="showRequestModal('${userData.nationalId}')" class="request-btn">
+                    <i class="fas fa-paper-plane"></i>
+                    طلب إعادة الوصول
+                </button>
+            `;
+            
+            return card;
+        }
+
+        // دالة إظهار المودال
+        function showRequestModal(nationalId) {
+            const modalHTML = `
+                <div class="modal" id="requestAccessModal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>طلب إعادة الوصول</h3>
+                            <button type="button" class="close-btn" onclick="closeRequestModal()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="requestMessage">سبب طلب إعادة الوصول</label>
+                                <textarea 
+                                    id="requestMessage" 
+                                    placeholder="اكتب سبب طلبك هنا..."
+                                    maxlength="500"
+                                    rows="4"
+                                ></textarea>
+                                <small class="char-count">0 / 500</small>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" onclick="closeRequestModal()" class="cancel-btn">
+                                <i class="fas fa-times"></i>
+                                إلغاء
+                            </button>
+                            <button type="button" class="send-btn" id="sendRequestBtn" data-national-id="${nationalId}">
+                                <span class="btn-text">
+                                    <i class="fas fa-paper-plane"></i>
+                                    إرسال الطلب
+                                </span>
+                                <span class="btn-loader" style="display: none;">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    جاري الإرسال...
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            const modal = document.getElementById('requestAccessModal');
+            const sendButton = modal.querySelector('#sendRequestBtn');
+            const textarea = modal.querySelector('#requestMessage');
+            const charCount = modal.querySelector('.char-count');
+
+            textarea.addEventListener('input', () => {
+                const count = textarea.value.length;
+                charCount.textContent = `${count} / 500`;
+            });
+
+            sendButton.addEventListener('click', () => handleSendRequest(nationalId));
+
+            setTimeout(() => modal.classList.add('show'), 100);
+        }
+
+        // دالة إغلاق المودال
+        function closeRequestModal() {
+            const modal = document.getElementById('requestAccessModal');
+            if (modal) {
+                modal.classList.remove('show');
+                setTimeout(() => modal.remove(), 300);
+            }
+        }
+
+        // دالة إظهار الإشعارات
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            // إضافة الأيقونة المناسبة
+            const icon = type === 'success' ? 'check-circle' : 'exclamation-circle';
+            notification.innerHTML = `
+                <i class="fas fa-${icon}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // تأخير بسيط قبل إظهار الإشعار للحصول على تأ��ير حركي أفضل
+            requestAnimationFrame(() => {
+                notification.classList.add('show');
+            });
+            
+            // إخفاء الإشعار بعد 3 ثواني
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 500);
+            }, 3000);
+        }
+
+        // دالة معالجة إرسال الطلب
+        async function handleSendRequest(nationalId) {
+            const modal = document.getElementById('requestAccessModal');
+            const sendButton = modal.querySelector('#sendRequestBtn');
+            const buttonText = sendButton.querySelector('.btn-text');
+            const buttonLoader = sendButton.querySelector('.btn-loader');
+            const textarea = modal.querySelector('#requestMessage');
+
+            try {
+                sendButton.disabled = true;
+                buttonText.style.display = 'none';
+                buttonLoader.style.display = 'inline-block';
+
+                const doctorData = JSON.parse(localStorage.getItem('doctorData'));
+                if (!doctorData) throw new Error('لم يتم العثور على بيانات الطبيب');
+
+                const requestData = {
+                    message: textarea.value.trim() || 'طلب إعادة وصول',
+                    timestamp: firebase.database.ServerValue.TIMESTAMP,
+                    status: 'pending',
+                    doctor: {
+                        name: doctorData.name,
+                        nationalId: doctorData.nationalId,
+                        specialty: doctorData.specialty,
+                        hospital: doctorData.hospital
+                    }
+                };
+
+                // إرسال الطلب
+                const newRequestRef = await firebase.database()
+                    .ref(`users/${nationalId}/accessRequests`)
+                    .push(requestData);
+
+                // إضافة الإشعار
+                await firebase.database()
+                    .ref(`users/${nationalId}/notifications`)
+                    .push({
+                        title: "طلب إعادة وصول جديد",
+                        message: `الدكتور ${doctorData.name} يطلب إعادة الوصول إلى ملفك الطبي`,
+                        timestamp: firebase.database.ServerValue.TIMESTAMP,
+                        type: "accessRequest",
+                        status: "unread",
+                        data: {
+                            doctorId: doctorData.nationalId,
+                            requestId: newRequestRef.key
+                        }
+                    });
+
+                closeRequestModal();
+                showNotification('تم إرسال طلب إعادة الوصول بنجاح');
+
+            } catch (error) {
+                console.error('خطأ:', error);
+                showNotification(error.message, 'error');
+                
+                sendButton.disabled = false;
+                buttonText.style.display = 'inline-block';
+                buttonLoader.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html> 

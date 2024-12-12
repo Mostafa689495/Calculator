@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <link rel="icon" type="image/x-icon" href="https://www2.0zz0.com/2024/11/17/11/646664920.png">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المحادثات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        :root {
+            --primary-color: #2196F3;
+            --secondary-color: #1976D2;
+            --accent-color: #FF4081;
+            --success-color: #4CAF50;
+            --background-color: #F5F7FA;
+            --text-primary: #263238;
+            --text-secondary: #546E7A;
+            --card-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --header-gradient: linear-gradient(135deg, #2196F3, #1976D2);
+            --border-radius: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background: var(--background-color);
+            padding: 12px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: var(--header-gradient);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 16px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 12px;
+            border: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-box {
+            background: white;
+            padding: 16px;
+            border-radius: var(--border-radius);
+            margin-bottom: 16px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #E0E7FF;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #F8FAFF;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: white;
+        }
+
+        .chat-item {
+            background: white;
+            padding: 16px;
+            border-radius: var(--border-radius);
+            margin-bottom: 12px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .chat-avatar {
+            width: 56px;
+            height: 56px;
+            background: var(--header-gradient);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .chat-content {
+            flex: 1;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .chat-header h3 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .last-message {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 4px;
+        }
+
+        .time {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            background: #F8FAFF;
+            padding: 4px 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .empty-state {
+            background: white;
+            padding: 32px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            box-shadow: var(--card-shadow);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+        }
+
+        .search-results {
+            margin-top: 16px;
+        }
+
+        .search-option {
+            padding: 12px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-primary);
+        }
+
+        .search-option.active {
+            background: #F8FAFF;
+            color: var(--primary-color);
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 32px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #E0E7FF;
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            margin: 0 auto 16px;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+
+            .container {
+                padding: 0;
+            }
+
+            .header {
+                padding: 16px;
+                border-radius: 12px;
+            }
+
+            .chat-item {
+                padding: 12px;
+                border-radius: 12px;
+            }
+
+            .chat-avatar {
+                width: 48px;
+                height: 48px;
+            }
+
+            .chat-header h3 {
+                font-size: 1rem;
+            }
+
+            .last-message {
+                font-size: 0.9rem;
+            }
+        }
+
+        .start-chat-btn {
+            background: var(--header-gradient);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .user-type-badge {
+            background: #F8FAFF;
+            color: var(--primary-color);
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .contact-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .contact-detail {
+            background: #F8FAFF;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .contact-detail.highlight {
+            background: #E3F2FD;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .chat-item, .search-box, .header, .empty-state, .time, 
+        .chat-avatar, .chat-header h3, .last-message, .back-btn {
+            transition: none;
+            transform: none !important;
+            animation: none !important;
+        }
+
+        .chat-item.unread .last-message::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            margin-left: 5px;
+        }
+
+        .empty-state, .error-state {
+            text-align: center;
+            padding: 40px 20px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            margin-top: 20px;
+        }
+
+        .empty-state i, .error-state i {
+            font-size: 3em;
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state h3, .error-state h3 {
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .empty-state p, .error-state p {
+            color: var(--text-secondary);
+        }
+
+        .error-state i {
+            color: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>المحادثات</h1>
+            <button class="back-btn" onclick="location.href='vaccines.html'">
+                <i class="fas fa-arrow-right"></i>
+                رجوع
+            </button>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="ابحث عن محادثة...">
+
+        </div>
+
+        <div id="chatList"></div>
+    </div>
+
+    <script>
+        // تهيئة Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYMRiJQs8vsapzX1bMHTWjrEb-N2ePIPo",
+            authDomain: "mhd-vaxtracker.firebaseapp.com",
+            databaseURL: "https://mhd-vaxtracker-default-rtdb.firebaseio.com",
+            projectId: "mhd-vaxtracker",
+            storageBucket: "mhd-vaxtracker.firebasestorage.app",
+            messagingSenderId: "104907445114",
+            appId: "1:104907445114:web:6110c5cf4e2607ed677cc3",
+            measurementId: "G-RF9SYJ2KCH"
+        };
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        class ChatManager {
+            constructor() {
+                this.db = firebase.database();
+                this.userId = localStorage.getItem('nationalId');
+                this.chats = [];
+                this.searchInput = document.getElementById('searchInput');
+                this.setupSearchListener();
+            }
+
+            setupSearchListener() {
+                this.searchInput.addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.toLowerCase();
+                    this.filterChats(searchTerm);
+                });
+            }
+
+            filterChats(searchTerm) {
+                const filteredChats = this.chats.filter(chat => 
+                    chat.doctorName?.toLowerCase().includes(searchTerm) ||
+                    chat.lastMessage?.text.toLowerCase().includes(searchTerm)
+                );
+                this.renderChats(filteredChats);
+            }
+
+            async initialize() {
+                try {
+                    // تحميل البيانات المحلية أولاً
+                    this.loadLocalData();
+                    
+                    // إعداد البحث
+                    this.setupSearch();
+                    
+                    // تحميل اليانات من السيرفر
+                    await this.loadChatsFromServer();
+                    
+                    // إعداد المستمعين للتحديثات المباشرة
+                    this.setupRealtimeListeners();
+                } catch (error) {
+                    console.error('Error initializing:', error);
+                }
+            }
+
+            async loadChatsFromServer() {
+                try {
+                    const chatsRef = this.db.ref('chats');
+                    const snapshot = await chatsRef
+                        .orderByChild(`participants/${this.userId}`)
+                        .equalTo(true)
+                        .once('value');
+                    
+                    const serverChats = [];
+                    for (const chatSnap of Object.values(snapshot.val() || {})) {
+                        const chat = chatSnap;
+                        chat.id = chatSnap.key;
+                        
+                        // البحث عن معلومات الدكتور
+                        const doctorId = Object.keys(chat.participants).find(id => id !== this.userId);
+                        if (doctorId) {
+                            const doctorData = await this.getDoctorInfo(doctorId);
+                            if (doctorData) {
+                                chat.doctorName = doctorData.name;
+                            }
+                        }
+                        
+                        serverChats.push(chat);
+                    }
+
+                    if (JSON.stringify(this.chats) !== JSON.stringify(serverChats)) {
+                        this.chats = serverChats;
+                        this.saveLocalData();
+                        this.renderChats(this.chats);
+                    }
+                } catch (error) {
+                    console.error('Error loading chats:', error);
+                    throw error;
+                }
+            }
+
+            async getDoctorInfo(nationalId) {
+                try {
+                    const doctorSnapshot = await this.db.ref('doctors')
+                        .orderByChild('nationalId')
+                        .equalTo(nationalId)
+                        .once('value');
+                    
+                    const doctorData = doctorSnapshot.val();
+                    return doctorData ? Object.values(doctorData)[0] : null;
+                } catch (error) {
+                    console.error('Error fetching doctor info:', error);
+                    return null;
+                }
+            }
+
+            createChatElement(chat) {
+                const div = document.createElement('div');
+                div.className = `chat-item ${chat.unread ? 'unread' : ''}`;
+                div.onclick = () => this.openChat(chat.id);
+
+                const doctorId = Object.keys(chat.participants).find(id => id !== this.userId);
+                const doctorName = chat.doctorName || '';
+                const displayName = doctorName.split(' ').slice(0, 2).join(' ');
+                
+                div.innerHTML = `
+                    <div class="chat-avatar">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <div class="chat-content">
+                        <div class="chat-header">
+                            <h3>د: ${displayName || 'طبيب'}</h3>
+                            <span class="time">
+                                <i class="far fa-clock"></i>
+                                ${this.formatTime(chat.lastMessage?.timestamp)}
+                            </span>
+                        </div>
+                        <p class="last-message">
+                            ${chat.lastMessage?.text || 'لا توجد رسائل'}
+                        </p>
+                    </div>
+                `;
+
+                return div;
+            }
+
+            formatTime(timestamp) {
+                if (!timestamp) return '';
+                const date = new Date(timestamp);
+                return date.toLocaleDateString('ar-EG', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+
+            openChat(chatId) {
+                try {
+                    // استخراج معرف الطبيب من المشاركين في المحادثة
+                    const doctorId = Object.keys(this.chats.find(chat => chat.id === chatId).participants)
+                        .find(id => id !== this.userId);
+                        
+                    if (!doctorId) {
+                        console.error('لم يتم العثور على معرف الطبيب');
+                        return;
+                    }
+
+                    // إنشاء معرف المحادثة الجديد بناءً على الأرقام القومية
+                    const newChatId = `${this.userId}_${doctorId}`;
+
+                    // توجيه المستخدم إلى صفحة المحادثة مع تمرير المعرفات الصحيحة
+                    window.location.href = `chat.html?chatId=${newChatId}&doctorId=${doctorId}`;
+                } catch (error) {
+                    console.error('Error opening chat:', error);
+                }
+            }
+
+            setupRealtimeListeners() {
+                const chatsRef = this.db.ref('chats');
+                chatsRef.orderByChild(`participants/${this.userId}`)
+                    .equalTo(true)
+                    .on('child_changed', snapshot => {
+                        const updatedChat = snapshot.val();
+                        updatedChat.id = snapshot.key;
+                        
+                        const index = this.chats.findIndex(chat => chat.id === updatedChat.id);
+                        if (index !== -1) {
+                            this.chats[index] = updatedChat;
+                            this.saveLocalData();
+                            this.renderChats(this.chats);
+                        }
+                    });
+            }
+
+            saveLocalData() {
+                localStorage.setItem('local_chats', JSON.stringify(this.chats));
+            }
+
+            loadLocalData() {
+                const localChats = localStorage.getItem('local_chats');
+                if (localChats) {
+                    this.chats = JSON.parse(localChats);
+                    this.renderChats(this.chats);
+                }
+            }
+
+            renderChats(chatsToRender) {
+                const container = document.getElementById('chatList');
+                container.innerHTML = '';
+
+                if (chatsToRender.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-comments"></i>
+                            <h3>لا توجد محادثات</h3>
+                            <p>ابدأ محادثة جديدة مع طبيب</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                chatsToRender.forEach(chat => {
+                    const chatElement = this.createChatElement(chat);
+                    container.appendChild(chatElement);
+                });
+            }
+
+            async setupSearch() {
+                const searchInput = document.getElementById('searchInput');
+                
+                // إضافة مستمع حدث للبحث
+                searchInput.addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.trim().toLowerCase();
+                    this.performSearch(searchTerm);
+                });
+            }
+
+            async performSearch(searchTerm) {
+                try {
+                    const chatList = document.getElementById('chatList');
+                    
+                    // إذا كان البحث فارغاً، نعرض كل المحادثات
+                    if (!searchTerm) {
+                        this.renderChats(this.chats);
+                        return;
+                    }
+
+                    // البحث في المحادثات الحالية
+                    const filteredChats = this.chats.filter(chat => {
+                        const doctorName = chat.doctorName?.toLowerCase() || '';
+                        const lastMessage = chat.lastMessage?.text.toLowerCase() || '';
+                        
+                        return doctorName.includes(searchTerm) || 
+                               lastMessage.includes(searchTerm);
+                    });
+
+                    // عرض النتائج
+                    if (filteredChats.length === 0) {
+                        chatList.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-search"></i>
+                                <h3>لا توجد نتائج</h3>
+                                <p>لم يتم العثور على نتائج مطابقة لـ "${searchTerm}"</p>
+                            </div>
+                        `;
+                    } else {
+                        this.renderChats(filteredChats);
+                    }
+
+                } catch (error) {
+                    console.error('خطأ في البحث:', error);
+                    chatList.innerHTML = `
+                        <div class="error-state">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <h3>حدث خطأ</h3>
+                            <p>حدث خطأ أثناء البحث</p>
+                        </div>
+                    `;
+                }
+            }
+
+            async searchAllUsers(searchTerm) {
+                try {
+                    const usersRef = this.db.ref('users');
+                    const fields = ['name', 'phone', 'email', 'nationalId'];
+                    const results = new Map();
+
+                    // البحث في كل الحقول
+                    await Promise.all(fields.map(async field => {
+                        const snapshot = await usersRef
+                            .orderByChild(field)
+                            .startAt(searchTerm)
+                            .endAt(searchTerm + '\uf8ff')
+                            .once('value');
+
+                        snapshot.forEach(userSnap => {
+                            const userData = userSnap.val();
+                            const userId = userSnap.key;
+
+                            if (userId !== this.userId && !this.hasExistingChat(userId)) {
+                                results.set(userId, {
+                                    id: userId,
+                                    isNewContact: true,
+                                    name: userData.name,
+                                    phone: userData.phone,
+                                    email: userData.email,
+                                    nationalId: userData.nationalId,
+                                    birthdate: userData.birthdate,
+                                    isDoctor: userData.isDoctor,
+                                    matchReason: field,
+                                    matchScore: this.calculateMatchScore(searchTerm, userData)
+                                });
+                            }
+                        });
+                    }));
+
+                    // ترتيب النتائج حسب درجة التطابق
+                    return Array.from(results.values())
+                        .sort((a, b) => b.matchScore - a.matchScore);
+
+                } catch (error) {
+                    console.error('خطأ في البحث عن المستخدمين:', error);
+                    return [];
+                }
+            }
+
+            calculateMatchScore(searchTerm, userData) {
+                let score = 0;
+                const term = searchTerm.toLowerCase();
+
+                // حساب درجة تطابق كل حقل
+                if (userData.name?.toLowerCase().includes(term)) score += 10;
+                if (userData.phone?.includes(term)) score += 8;
+                if (userData.email?.toLowerCase().includes(term)) score += 6;
+                if (userData.nationalId?.includes(term)) score += 8;
+
+                return score;
+            }
+
+            showLoadingState() {
+                const container = document.getElementById('chatList');
+                container.innerHTML = `
+                    <div class="loading-state">
+                        <div class="spinner"></div>
+                        <p>جاري البحث...</p>
+                    </div>
+                `;
+            }
+
+            showSearchStats(count) {
+                const statsEl = document.createElement('div');
+                statsEl.className = 'search-stats';
+                statsEl.innerHTML = `تم العثور على ${count} نتيجة`;
+                document.querySelector('.search-box').appendChild(statsEl);
+            }
+
+            createNewContactElement(userData) {
+                const div = document.createElement('div');
+                div.className = `chat-item new-contact ${userData.isDoctor ? 'doctor' : 'patient'}`;
+                div.onclick = () => this.startNewChat(userData.id);
+
+                div.innerHTML = `
+                    <div class="chat-avatar ${userData.isDoctor ? 'doctor-avatar' : 'patient-avatar'}">
+                        <i class="fas ${userData.isDoctor ? 'fa-user-md' : 'fa-user'}"></i>
+                    </div>
+                    <div class="chat-content">
+                        <div class="chat-header">
+                            <h3>${userData.name}</h3>
+                            <span class="user-type-badge">
+                                ${userData.isDoctor ? 'طبيب' : 'مريض'}
+                            </span>
+                        </div>
+                        <div class="contact-details">
+                            ${this.renderContactDetail('phone', userData)}
+                            ${this.renderContactDetail('email', userData)}
+                            ${this.renderContactDetail('nationalId', userData)}
+                            ${userData.birthdate ? `
+                                <p class="contact-detail">
+                                    <i class="fas fa-birthday-cake"></i>
+                                    ${new Date(userData.birthdate).toLocaleDateString('ar-EG')}
+                                </p>
+                            ` : ''}
+                        </div>
+                        <button class="start-chat-btn">
+                            <i class="fas fa-comments"></i>
+                            بدء محادثة
+                        </button>
+                    </div>
+                `;
+
+                return div;
+            }
+
+            renderContactDetail(type, userData) {
+                const icons = {
+                    phone: 'fa-phone',
+                    email: 'fa-envelope',
+                    nationalId: 'fa-id-card'
+                };
+
+                return userData[type] ? `
+                    <p class="contact-detail ${userData.matchReason === type ? 'highlight' : ''}">
+                        <i class="fas ${icons[type]}"></i>
+                        ${userData[type]}
+                    </p>
+                ` : '';
+            }
+
+            async startNewChat(userId) {
+                try {
+                    const chatId = `${this.userId}_${userId}`;
+                    await this.db.ref(`chats/${chatId}`).set({
+                        createdAt: firebase.database.ServerValue.TIMESTAMP,
+                        participants: {
+                            [this.userId]: true,
+                            [userId]: true
+                        },
+                        lastMessage: {
+                            text: 'بدء محادثة جديدة',
+                            timestamp: firebase.database.ServerValue.TIMESTAMP,
+                            senderId: this.userId
+                        }
+                    });
+
+                    window.location.href = `chat.html?id=${chatId}`;
+                } catch (error) {
+                    console.error('خطأ في بدء محادثة جديدة:', error);
+                    showNotification('حدث خطأ في بدء المحادثة', 'error');
+                }
+            }
+        }
+
+        // دء التطبيق
+        const chatManager = new ChatManager();
+        document.addEventListener('DOMContentLoaded', () => {
+            chatManager.initialize();
+        });
+    </script>
+</body>
+</html>

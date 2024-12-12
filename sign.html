@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <link rel="icon" type="image/x-icon" href="https://www2.0zz0.com/2024/11/17/11/646664920.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - نظام التطعيمات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #2ecc71;
+            --warning-color: #f1c40f;
+            --background-color: #f8fafc;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background: var(--background-color);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(44, 62, 80, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(52, 152, 219, 0.1) 0%, transparent 20%);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .logo i {
+            font-size: 3.5em;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        h1 {
+            color: #333;
+            font-size: 1.8em;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .input-wrapper {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            transition: color 0.3s ease;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            padding-right: 45px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: var(--background-color);
+        }
+
+        input:focus {
+            border-color: var(--secondary-color);
+            background: white;
+            box-shadow: 0 0 0 5px rgba(52, 152, 219, 0.1);
+            outline: none;
+        }
+
+        input:focus + i {
+            color: var(--secondary-color);
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+
+        .login-link a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .login-link a:hover {
+            color: var(--primary-color);
+        }
+
+        .error-message {
+            margin-top: 8px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background-color: rgba(231, 76, 60, 0.1);
+            border-right: 3px solid var(--accent-color);
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* تحسينات للشاشات الصغيرة */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            input {
+                font-size: 14px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+        }
+
+        /* أنماط حالة التحميل */
+        .loading-state {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .loading-state .button-content {
+            opacity: 0;
+        }
+
+        .loading-state .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+        }
+
+        .loading-spinner i {
+            animation: spin 1s infinite linear;
+        }
+
+        button.success {
+            background: linear-gradient(135deg, var(--success-color), #27ae60) !important;
+        }
+
+        button.error {
+            background: linear-gradient(135deg, var(--accent-color), #c0392b) !important;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* أنماط حالات الزر */
+        button {
+            transition: all 0.3s ease !important;
+        }
+
+        button.success {
+            background: linear-gradient(135deg, var(--success-color), #27ae60) !important;
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3) !important;
+        }
+
+        button.error {
+            background: linear-gradient(135deg, var(--accent-color), #c0392b) !important;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3) !important;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* تحسين شكل رسالة الخطأ */
+        .error-message {
+            margin-top: 8px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            background-color: rgba(231, 76, 60, 0.1);
+            border-right: 3px solid var(--accent-color);
+            color: var(--accent-color);
+            font-weight: 600;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <i class="fas fa-syringe"></i>
+            <h1>نظام متابعة التطعيمات</h1>
+        </div>
+
+        <form id="registrationForm" onsubmit="handleSubmit(event)">
+            <div class="form-group">
+                <label for="name">الاسم الكامل</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="name" required>
+                </div>
+                <div class="error-message" id="nameError">يرجى إدخال الاسم الكامل</div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">البريد الإلكتروني</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="error-message" id="emailError">يرجى إدخال بريد إلكتروني صحيح</div>
+            </div>
+
+            <div class="form-group">
+                <label for="nationalId">الرقم القومي</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-id-card"></i>
+                    <input type="text" id="nationalId" required>
+                </div>
+                <div class="error-message" id="idError">يرجى إدخال رقم قومي صحيح</div>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">رقم الهاتف</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-phone"></i>
+                    <input type="tel" id="phone" required>
+                </div>
+                <div class="error-message" id="phoneError">يرجى إدخال رقم هاتف صحيح</div>
+            </div>
+
+            <div class="form-group">
+                <label for="birthdate">تاريخ الميلاد</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-calendar-alt"></i>
+                    <input type="date" id="birthdate" required>
+                </div>
+                <div class="error-message" id="birthdateError">يرجى إدخال تاريخ ميلاد صحيح</div>
+            </div>
+
+            <button type="submit" id="submitButton">
+                <span class="button-content">
+                    <i class="fas fa-user-plus"></i>
+                    تسجيل حساب جديد
+                </span>
+                <span class="loading-spinner" style="display: none;">
+                    <i class="fas fa-spinner"></i>
+                    جاري انشاء الحساب...
+                </span>
+            </button>
+
+            <div class="login-link">
+                لديك حساب بالفعل؟ <a href="login.html">تسجيل الدخول</a>
+            </div>
+        </form>
+    </div>
+
+    <script type="module">
+        // التحقق من وجود بيانات مسجلة عند تحميل الصفحة
+        window.onload = function() {
+             const userData = localStorage.getItem('userData');
+             if (userData) {
+                 window.location.href = './vaccines.html';
+            }
+        }
+        // تحديث استيراد Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // تكوين Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYMRiJQs8vsapzX1bMHTWjrEb-N2ePIPo",
+            authDomain: "mhd-vaxtracker.firebaseapp.com",
+            databaseURL: "https://mhd-vaxtracker-default-rtdb.firebaseio.com",
+            projectId: "mhd-vaxtracker",
+            storageBucket: "mhd-vaxtracker.firebasestorage.app",
+            messagingSenderId: "104907445114",
+            appId: "1:104907445114:web:6110c5cf4e2607ed677cc3",
+            measurementId: "G-RF9SYJ2KCH"
+        };
+
+
+        // تهيئة Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // تعريف handleSubmit كدالة عامة
+        window.handleSubmit = async function(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const submitButton = document.getElementById('submitButton');
+            const buttonContent = submitButton.querySelector('.button-content');
+            const loadingSpinner = submitButton.querySelector('.loading-spinner');
+
+            try {
+                // التحقق من صحة البيانات
+                if (!validateForm()) {
+                    return;
+                }
+
+                // بدء حالة التحميل
+                startLoading(submitButton, buttonContent, loadingSpinner);
+
+                // جمع بيانات النموذج
+                const userData = {
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    nationalId: document.getElementById('nationalId').value,
+                    phone: document.getElementById('phone').value,
+                    birthdate: document.getElementById('birthdate').value,
+                    timestamp: new Date().toISOString()
+                };
+
+                // التحقق من وجود المستخدم
+                const userRef = ref(database, 'users/' + userData.nationalId);
+                const snapshot = await get(userRef);
+
+                if (snapshot.exists()) {
+                    // إظهار رسالة أن المستخدم موجود بالفعل
+                    showError(submitButton, buttonContent, loadingSpinner, 'هذا الرقم القومي مسجل بالفعل');
+                    const errorMessage = document.getElementById('idError');
+                    errorMessage.innerHTML = `
+                        هذا الرقم القومي مسجل بالفعل. 
+                        <a href="login.html" style="color: var(--secondary-color); text-decoration: none; font-weight: bold; margin-right: 5px;">
+                            تسجيل الدخول
+                        </a>
+                    `;
+                    errorMessage.style.display = 'block';
+                    return;
+                }
+
+                // حفظ البيانات في Firebase
+                await set(userRef, userData);
+                
+                // تخزين البيانات محلياً
+                localStorage.setItem('nationalId', userData.nationalId);
+                localStorage.setItem('userData', JSON.stringify(userData));
+                
+                // إظهار رسالة النجاح
+                // إذا لم يكن المستخدم موجوداً، تابع عملية التسجيل
+                const userData = {
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    nationalId: nationalId,
+                    phone: document.getElementById('phone').value,
+                    birthdate: document.getElementById('birthdate').value,
+                    timestamp: new Date().toISOString()
+                };
+
+                await set(userRef, userData);
+                
+                // تخزين الرقم القومي في localStorage
+                localStorage.setItem('nationalId', nationalId);
+                localStorage.setItem('userData', JSON.stringify(userData));
+                
+                showSuccess(submitButton, buttonContent, loadingSpinner);
+                
+                setTimeout(() => {
+                    window.location.href = 'vaccines.html';
+                }, 1500);
+                
+            } catch (error) {
+                console.error("خطأ في حفظ البيانات:", error);
+                showError(submitButton, buttonContent, loadingSpinner, 'حدث خطأ أثناء التسجيل. يرجى المحاولة مرة أخرى');
+            }
+        }
+
+        function startLoading(button, content, spinner) {
+            button.classList.add('loading-state');
+            content.style.opacity = '0';
+            spinner.style.display = 'flex';
+            button.disabled = true;
+        }
+
+        function showSuccess(button, content, spinner) {
+            button.classList.remove('loading-state');
+            button.classList.add('success');
+            spinner.style.display = 'none';
+            content.style.opacity = '1';
+            content.innerHTML = '<i class="fas fa-check"></i> تم انشاء الحساب بنجاح';
+        }
+
+        function showError(button, content, spinner, message = 'حدث خطأ') {
+            button.classList.remove('loading-state');
+            button.classList.add('error');
+            spinner.style.display = 'none';
+            content.style.opacity = '1';
+            content.innerHTML = '<i class="fas fa-times"></i> حدث خطأ';
+            
+            const errorMessage = document.getElementById('idError');
+            if (errorMessage) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+            }
+            
+            setTimeout(() => {
+                button.classList.remove('error');
+                button.disabled = false;
+                content.innerHTML = '<i class="fas fa-user-plus"></i> تسجيل حساب جديد';
+            }, 2000);
+        }
+
+
+    </script>
+
+    <!-- نقل دالة validateForm خارج النموذج النمطي -->
+    <script>
+        function validateForm() {
+            let isValid = true;
+            const button = document.getElementById('submitButton');
+            
+            // التحقق من الاسم
+            const name = document.getElementById('name').value;
+            if (name.length < 3) {
+                document.getElementById('nameError').style.display = 'block';
+                button.classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('nameError').style.display = 'none';
+            }
+
+            // التحقق من البريد الإلكتروني
+            const email = document.getElementById('email').value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                document.getElementById('emailError').style.display = 'block';
+                button.classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('emailError').style.display = 'none';
+            }
+
+            // التحقق من الرقم القومي
+            const nationalId = document.getElementById('nationalId').value;
+            if (nationalId.length !== 14) {
+                document.getElementById('idError').style.display = 'block';
+                button.classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('idError').style.display = 'none';
+            }
+
+            // التحقق من رقم الهاتف
+            const phone = document.getElementById('phone').value;
+            if (phone.length < 11) {
+                document.getElementById('phoneError').style.display = 'block';
+                button.classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('phoneError').style.display = 'none';
+            }
+
+            // إذا كان هناك أخطاء، أضف تأثير الهزة للزر
+            if (!isValid) {
+                button.classList.add('error');
+                setTimeout(() => {
+                    button.classList.remove('error');
+                }, 500);
+            }
+
+            return isValid;
+        }
+    </script>
+</body>
+</html> 

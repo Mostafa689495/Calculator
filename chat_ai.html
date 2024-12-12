@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المساعد الذكي للتطعيمات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e0eafc, #cfdef3);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: background 0.5s ease;
+        }
+
+        .chat-container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+            transition: transform 0.3s ease;
+        }
+
+
+
+        .chat-header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .chat-header h1 {
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: fadeIn 1s ease;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            animation: slideIn 0.5s ease;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            max-width: 80%;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            transition: transform 0.3s ease;
+        }
+
+
+
+        .user-message {
+            margin-right: auto;
+            background: #3498db;
+            color: white;
+            border-radius: 15px 15px 0 15px;
+            padding: 12px 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .bot-message {
+            margin-left: auto;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 15px 15px 15px 0;
+            padding: 12px 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            line-height: 1.6;
+        }
+
+        .bot-message p {
+            margin-bottom: 8px;
+        }
+
+        .bot-message p:last-child {
+            margin-bottom: 0;
+        }
+
+        .chat-input {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #eee;
+            border-radius: 25px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
+
+        .send-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .send-btn:hover {
+            background: #2980b9;
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+            align-self: flex-start;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #90a4ae;
+            border-radius: 50%;
+            animation: typing 1s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+                margin: 0;
+                background: linear-gradient(165deg, #4f46e5, #3b82f6);
+                height: 100vh;
+                overflow: hidden;
+            }
+
+            .chat-container {
+                height: 100vh;
+                width: 100vw;
+                margin: 0;
+                border-radius: 0;
+                background: rgba(255, 255, 255, 0.98);
+                box-shadow: none;
+            }
+
+            .chat-header {
+                background: linear-gradient(135deg, #4f46e5, #3b82f6);
+                padding: 16px;
+                height: 70px;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+            }
+
+            .chat-header h1 {
+                font-size: 1.3rem;
+                font-weight: 700;
+                letter-spacing: 0.5px;
+                color: rgba(255, 255, 255, 0.95);
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            .chat-messages {
+                margin-top: 70px;
+                padding: 15px;
+                height: calc(100vh - 140px);
+                background: #f8fafc;
+            }
+
+            .message {
+                max-width: 88%;
+                margin-bottom: 12px;
+                animation: slideInMessage 0.3s ease;
+            }
+
+            .user-message {
+                background: linear-gradient(135deg, #4f46e5, #3b82f6);
+                color: white;
+                padding: 14px 18px;
+                border-radius: 18px 18px 4px 18px;
+                font-size: 0.95rem;
+                box-shadow: 0 3px 10px rgba(79, 70, 229, 0.2);
+            }
+
+            .bot-message {
+                background: white;
+                padding: 14px 18px;
+                border-radius: 18px 18px 18px 4px;
+                font-size: 0.95rem;
+                line-height: 1.6;
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            }
+
+            .chat-input {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                padding: 12px 16px;
+                background: white;
+                border-top: 1px solid rgba(0, 0, 0, 0.05);
+                box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.05);
+            }
+
+            .chat-input input {
+                background: #f1f5f9;
+                border: none;
+                padding: 14px 20px;
+                border-radius: 25px;
+                font-size: 0.95rem;
+                box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+            }
+
+            .send-btn {
+                width: 45px;
+                height: 45px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #4f46e5, #3b82f6);
+                box-shadow: 0 3px 10px rgba(79, 70, 229, 0.3);
+            }
+
+            .back-btn, .clear-btn {
+                background: rgba(255, 255, 255, 0.2);
+                backdrop-filter: blur(10px);
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-size: 0.9rem;
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+            }
+        }
+
+        /* إضافة تأثيرات حركية جديدة */
+        @keyframes slideInMessage {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* تحسينات عضافية للشاشات الصغيرة جداً */
+        @media (max-width: 380px) {
+            .chat-header h1 {
+                font-size: 1.2rem;
+            }
+
+            .message {
+                max-width: 90%;
+            }
+
+            .chat-input input {
+                font-size: 0.95rem;
+                padding: 10px 15px;
+            }
+
+            .send-btn {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        /* تحسين التمرير */
+        .chat-messages {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        .clear-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .clear-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .message-reference {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+            font-style: italic;
+        }
+
+        .highlight-special {
+            color: #e74c3c;
+            font-weight: 700;
+            padding: 2px 5px;
+            border-radius: 4px;
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .highlight-bold {
+            font-weight: 700;
+            color: #e74c3c;
+        }
+
+        .highlight-italic {
+            font-style: italic;
+            color: #3498db;
+        }
+
+        .custom-list {
+            list-style: none;
+            padding-right: 20px;
+            margin: 8px 0;
+        }
+
+        .list-item {
+            position: relative;
+            padding: 4px 25px 4px 0;
+            line-height: 1.5;
+            color: #34495e;
+        }
+
+        .list-item::before {
+            content: "•";
+            position: absolute;
+            right: 0;
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        /* تنسيق العناوين الرئيسية */
+        .bot-message p:not(.list-item) {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+
+        /* تحسين المسافت بين العناصر */
+        .bot-message ul + p {
+            margin-top: 15px;
+        }
+
+        .chats-list {
+            position: fixed;
+            right: 20px;
+            top: 100px;
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            max-width: 300px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .chat-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+
+
+        .chat-date {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .new-chat-btn {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+
+
+        :root {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            --primary-color: #2c3e50;
+            --primary-light: #2e567d;
+            --primary-dark: #3498db;
+            --primary-gradient: linear-gradient(145deg, var(--primary-color), var(--primary-dark));
+            --surface-color: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        /* تحسينات للموبايل */
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+                margin: 0;
+                background: var(--primary-gradient);
+                height: 100vh;
+                overflow: hidden;
+            }
+
+            .chat-container {
+                height: 100vh;
+                width: 100vw;
+                margin: 0;
+                border-radius: 0;
+                background: var(--surface-color);
+            }
+
+            .chat-header {
+                background: var(--primary-gradient);
+                padding: 16px;
+                height: 65px;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+            }
+
+            .chat-messages {
+                margin-top: 65px;
+                margin-bottom: 80px;
+                padding: 15px;
+                height: calc(100vh - 145px);
+                background: #fafafa;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                scroll-behavior: smooth;
+                overscroll-behavior-y: contain;
+                position: relative;
+            }
+
+            .user-message {
+                background: var(--primary-gradient);
+                color: white;
+                padding: 14px 18px;
+                border-radius: 18px 18px 4px 18px;
+                font-size: 0.95rem;
+                box-shadow: var(--shadow-sm);
+                max-width: 85%;
+            }
+
+            .bot-message {
+                background: var(--surface-color);
+                padding: 14px 18px;
+                border-radius: 18px 18px 18px 4px;
+                font-size: 0.95rem;
+                line-height: 1.6;
+                box-shadow: var(--shadow-sm);
+                border: 1px solid rgba(0, 0, 0, 0.05);
+                max-width: 85%;
+                overflow-wrap: break-word;
+                word-wrap: break-word;
+                hyphens: auto;
+            }
+
+            .chat-input {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                padding: 12px 16px;
+                background: var(--surface-color);
+                border-top: 1px solid rgba(0, 0, 0, 0.05);
+                box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+                z-index: 1000;
+                backdrop-filter: blur(10px);
+            }
+
+            .chat-input input {
+                background: #f8fafc;
+                border: 1px solid rgba(0, 0, 0, 0.08);
+                padding: 12px 20px;
+                border-radius: 25px;
+                font-size: 0.95rem;
+            }
+
+            .send-btn {
+                width: 45px;
+                height: 45px;
+                border-radius: 50%;
+                background: var(--primary-gradient);
+                box-shadow: var(--shadow-sm);
+            }
+
+            /* تحسين التمرير */
+            .chat-messages::-webkit-scrollbar {
+                width: 3px;
+            }
+
+            .chat-messages::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .chat-messages::-webkit-scrollbar-thumb {
+                background-color: rgba(0, 0, 0, 0.1);
+                border-radius: 20px;
+            }
+
+            .message {
+                max-width: 85%;
+                margin-bottom: 12px;
+                position: relative;
+                z-index: 1;
+            }
+
+            .message:last-child {
+                margin-bottom: 20px;
+            }
+        }
+
+        /* تحسينات إضافية للشاشات الصغيرة جداً */
+        @media (max-width: 380px) {
+            .chat-messages {
+                margin-bottom: 70px;
+                height: calc(100vh - 135px);
+            }
+
+            .chat-input {
+                padding: 8px 12px;
+            }
+        }
+
+        .chat-table {
+            width: 100%;
+            margin: 10px 0;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-table td {
+            padding: 10px 15px;
+            border: 1px solid #e0e0e0;
+            text-align: right;
+        }
+
+        .chat-table tr:nth-child(even) {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        @media (max-width: 768px) {
+            .chat-table {
+                font-size: 0.9rem;
+            }
+            
+            .chat-table td {
+                padding: 8px 12px;
+            }
+        }
+
+        .table-content {
+            padding: 5px 0;
+        }
+
+        .table-point {
+            padding: 5px 25px 5px 5px;
+            position: relative;
+            line-height: 1.5;
+        }
+
+        .table-point:before {
+            content: "•";
+            position: absolute;
+            right: 8px;
+            color: #3498db;
+        }
+
+        .chat-table th {
+            background: #3498db;
+            color: white;
+            padding: 12px 15px;
+            text-align: right;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* إضافة أنماط جديدة في قسم الـ style */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            gap: 15px;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .send-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .chat-input input:disabled {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        .send-btn {
+            transition: all 0.3s ease;
+        }
+
+        .send-btn.stopping {
+            background: #e74c3c !important;
+            transform: scale(1.1);
+        }
+
+        .typing-effect {
+            border-right: 2px solid #000;
+            animation: blink 0.7s infinite;
+        }
+
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+
+        /* إضافة أنماط CSS جديدة */
+        .custom-dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .custom-dialog {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            max-width: 90%;
+            width: 400px;
+            text-align: center;
+            animation: slideIn 0.3s ease;
+        }
+
+        .custom-dialog h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .custom-dialog-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .dialog-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .dialog-btn-confirm {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .dialog-btn-cancel {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        .dialog-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        }
+
+        .mic-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .mic-btn.recording {
+            background: #e74c3c;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .mic-btn:hover {
+            background: #2980b9;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>
+                <i class="fas fa-robot"></i>
+                مساعد التطعيمات
+            </h1>
+            <div class="header-buttons">
+
+                <button class="back-btn" onclick="window.location.href='vaccines.html'">
+                    <i class="fas fa-arrow-right"></i>
+                    عودة
+                </button>
+            </div>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                مرحباً! أنا مساعدك الذكي للتطعيمات. كيف يمكنني مساعدتك اليوم؟
+            </div>
+        </div>
+        
+        <div class="chat-input">
+            <button class="mic-btn" id="micButton">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <input type="text" id="userInput" placeholder="اكتب سؤالك هنا..." 
+                   onkeypress="if(event.key === 'Enter') sendMessage()">
+            <button class="send-btn" onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // إعدادات البيئة
+        const environment = {
+            firebase: {
+                apiKey: 'AIzaSyAT_Sj07e550Kkb-T9AshsbKINI1TPfDUc',
+                authDomain: 'mhd1-8a07b.firebaseapp.com',
+                databaseURL: 'https://mhd1-8a07b-default-rtdb.firebaseio.com/',
+                projectId: 'mhd1-8a07b',
+                storageBucket: 'mhd1-8a07b.firebasestorage.app',
+                messagingSenderId: '527711574560',
+                appId: '1:527711574560:web:e2e4640b316f1725537a45',
+                measurementId: '',
+            },
+            gemini_api_key: 'AIzaSyADaEiVHPCdmuFzSYDLBiS4ab0M3WISIF8',
+            debug_token: ''
+        };
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYMRiJQs8vsapzX1bMHTWjrEb-N2ePIPo",
+            authDomain: "mhd-vaxtracker.firebaseapp.com",
+            databaseURL: "https://mhd-vaxtracker-default-rtdb.firebaseio.com",
+            projectId: "mhd-vaxtracker",
+            storageBucket: "mhd-vaxtracker.firebasestorage.app",
+            messagingSenderId: "104907445114",
+            appId: "1:104907445114:web:6110c5cf4e2607ed677cc3",
+            measurementId: "G-RF9SYJ2KCH"
+        };
+
+        // تهيئة Firebase
+        firebase.initializeApp(environment.firebase);
+
+        // إضافة متغير لتخزين سياق المحادثة
+        let conversationContext = [];
+
+        // إضافة متغير لتخزين الرقم القومي
+        let nationalId = localStorage.getItem('nationalId');
+
+        // إضافة متغير للتحكم في إيقاف الإجابة
+        let isGenerating = false;
+        let shouldStop = false;
+
+        // دالة مساعدة لحساب العمر بالشهور
+        function calculateAgeInMonths(birthdate) {
+            const birth = new Date(birthdate);
+            const today = new Date();
+            let months = (today.getFullYear() - birth.getFullYear()) * 12;
+            months += today.getMonth() - birth.getMonth();
+            
+            if (today.getDate() < birth.getDate()) {
+                months--;
+            }
+            
+            return months;
+        }
+        function calculateAge(birthdate) {
+            const birth = new Date(birthdate);
+            const today = new Date();
+            
+            // حساب العمر بالسنوات
+            let years = today.getFullYear() - birth.getFullYear();
+            let months = today.getMonth() - birth.getMonth();
+            
+            // تعديل العمر إذا لم يصل شهر الميلاد بعد
+            if (months < 0 || (months === 0 && today.getDate() < birth.getDate())) {
+                years--;
+                months += 12;
+            }
+    
+            // حساب الأيام المتبقية
+            let days = today.getDate() - birth.getDate();
+            if (days < 0) {
+                months--;
+                const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, birth.getDate());
+                days += Math.floor((today - lastMonth) / (1000 * 60 * 60 * 24));
+            }
+            
+            // تنسيق النص بالعربية
+            let ageText = '';
+            if (years > 0) {
+                ageText += `${years} سنة `;
+            }
+            if (months > 0) {
+                ageText += `${months} شهر `;
+            }
+            if (days > 0) {
+                ageText += `${days} يوم`;
+            }
+            
+            return {
+                years,
+                months,
+                days,
+                text: ageText.trim(),
+                totalMonths: years * 12 + months
+            };
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const sendButton = document.querySelector('.send-btn');
+            
+            if (isGenerating) {
+                // إيقاف الإجابة الحالية
+                shouldStop = true;
+                return;
+            }
+
+            const message = input.value.trim();
+            if (!message) return;
+
+            input.value = '';
+            input.disabled = true;
+            isGenerating = true;
+            shouldStop = false;
+
+            // تغيير شكل زر الإرسال إلى زر الإيقاف
+            sendButton.innerHTML = '<i class="fas fa-stop"></i>';
+            sendButton.style.background = '#e74c3c';
+            
+            addMessage(message, 'user');
+            showTypingIndicator();
+
+            try {
+                // إضافة الرسالة الحالية إلى سياق المحادثة
+                conversationContext.push({
+                    role: "user",
+                    content: message
+                });
+                
+
+                // تحضير السياق الكامل للمحادثة
+                const userData = JSON.parse(localStorage.getItem('userData'));
+                const age = calculateAge(userData.birthdate);
+                let prompt = `
+                    أنت مساعد ذكي متخصص في التطعيمات. 
+                    تم برمجتك وتدريبك بواسطة مصطفي حازم جبريل.
+                    
+                    معلومات المستخدم:
+                    الاسم: ${userData.name}
+                    تاريخ الميلاد: ${userData.birthdate}
+                    اليوم الان هو ${new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' })}
+                    العمر: ${age.text} (${age.totalMonths} شهر)
+
+                    ودا جدول التطعيمات المناسب لعمر المستخدم:
+                    0: [ // عند الولادة
+                        { name: "التطعيم ضد الدرن (BCG)", id: "bcg1" },
+                        { name: "التطعيم ضد التهاب الكبد الوبائي ب (الجرعة الأولى)", id: "hepb1" }
+                    ],
+                    2: [ // شهرين
+                        { name: "التطعيم ضد الدفتيريا والتيتانوس والسعال الديكي (الجرعة الأولى)", id: "dtp1" },
+                        { name: "التطعيم ضد شلل الأطفال (لجرعة الأولى)", id: "polio1" },
+                        { name: "التطعيم ضد المستدمية النزلية (الجرعة الأولى)", id: "hib1" },
+                        { name: "التطعيم ضد التهاب لكبد الوبائي  (الجرعة الثانية)", id: "hepb2" },
+                        { name: "التطعيم ضد الالتهاب الرئوي (الجرعة الأولى)", id: "pcv1" },
+                        { name: "التطعيم ضد فيروس الروتا (الجرعة الأولى)", id: "rota1" }
+                    ],
+                    4: [ // 4 شهور
+                        { name: "التطعيم ضد الدفتيريا والتيتانوس والسعال الديكي (الجرعة الثانية)", id: "dtp2" },
+                        { name: "التطعيم ضد شلل الأطفل (الجرعة الثانية)", id: "polio2" },
+                        { name: "التطعيم ضد المستدمية النزلية (الجرعة الثانية)", id: "hib2" },
+                        { name: "التطعيم ضد الالتهاب الرئوي (الجرعة الثانية)", id: "pcv2" },
+                        { name: "التطعيم ضد فيروس الروتا (الجرعة الثانية)", id: "rota2" }
+                    ],
+                    6: [ // 6 شهور
+                        { name: "التطعيم ضد الدفتيريا والتيتانوس والسعال الديكي (الجرعة الثالثة)", id: "dtp3" },
+                        { name: "التطعيم ضد شلل الأطفال (الجرعة الثالثة)", id: "polio3" },
+                        { name: "التطعيم ضد المستدمية لنزلية (الجرعة الثالثة)", id: "hib3" },
+                        { name: "التطعيم ضد الالتهاب الرئوي (الجرعة الثالثة)", id: "pcv3" },
+                        { name: "التطعيم ضد فيروس الروتا (الجرعة الثالثة)", id: "rota3" }
+                    ],
+                    12: [ // 12 شهر
+                        { name: "التطعيم ضد الحصبة والنكاف والحصبة الألمانية (الجرعة الأولى)", id: "mmr1" },
+                        { name: "التطعيم ضد الجدير المائي (الجرع الأولى)", id: "var1" },
+                        { name: "التطعيم ضد التهاب الكبد A (الجرعة الأوى)", id: "hepa1" },
+                        { name: "اتطعيم ضد الأنفلونزا", id: "flu1" }
+                    ],
+                    18: [ // 18 شهر
+                        { name: "التطعيم ضد الحصة النكاف والحصبة الألمانية (الجرعة الثانية)", id: "mmr2" },
+                        { name: "التطعيم ضد الدفتيريا والتيتانوس والسعال الديكي (جرعة تعزيزية)", id: "dtp4" },
+                        { name: "التطعيم ضد شلل الأطفال (جرعة تعزيزية)", id: "polio4" }
+                    ],
+                    24: [ // 24 شهر
+                        { name: "التطعيم ضد الأنفلونزا (إذا كان موسمياً)", id: "flu2" },
+                        { name: "التطعيم ضد التهاب الكبد A (الجرعة الثانية)", id: "hepa2" }
+                    
+                    لو حد قالك اهلا او مرحبا او مرحبا بك او اي شيء من هذه الكلمات قل اي تحية  
+   
+                    السياق السابق للمحادثة:
+                    ${conversationContext.slice(-3).map(msg => `${msg.role}: ${msg.content}`).join('\n')}
+                    
+                    الرجاء فهم السياق وتقديم إجابة مناسبة للرسالة الأخيرة.
+                    
+                    ملاحظات مهمة:
+                    - استخدم اسم المست��دم في ردودك لجعل المحادثة أكثر شخصية
+                    - قدم توصيات مخصصة بناءً على عمر المستخدم
+                    - تحقق من جدول التطعيمات المناسب لعمر المستخدم
+                `;
+
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${environment.gemini_api_key}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: prompt
+                            }]
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                let answer = data.candidates[0].content.parts[0].text;
+
+                // إند بدء عرض الإجابة
+                hideTypingIndicator(); // إخفاء علامات التحميل قبل بدء عرض الإجابة
+
+                // عرض الإجابة حرفاً حرفاً
+                let displayedAnswer = '';
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message bot-message';
+                document.getElementById('chatMessages').appendChild(messageDiv);
+
+                for (let i = 0; i < answer.length; i++) {
+                    if (shouldStop) {
+                        messageDiv.innerHTML = formatText(displayedAnswer + '... (تم إيقاف الإجابة)');
+                        break;
+                    }
+                    displayedAnswer += answer[i];
+                    messageDiv.innerHTML = formatText(displayedAnswer);
+                    await new Promise(resolve => setTimeout(resolve, 30));
+                    messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                }
+
+                if (!shouldStop) {
+                    conversationContext.push({
+                        role: "assistant",
+                        content: answer
+                    });
+                    await saveChatHistory();
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                hideTypingIndicator();
+                addMessage('عذراً، حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.', 'bot');
+            } finally {
+                isGenerating = false;
+                shouldStop = false;
+                input.disabled = false;
+                
+                // إعادة زر الإرسال إلى شكله الطبيعي
+                sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                sendButton.style.background = 'var(--primary-gradient)';
+            }
+        }
+
+        // تحديث دالة مسح المحادثة
+        async function clearChat() {
+            const showConfirmDialog = () => {
+                return new Promise((resolve) => {
+                    const overlay = document.createElement('div');
+                    overlay.className = 'custom-dialog-overlay';
+                    
+                    const dialog = document.createElement('div');
+                    dialog.className = 'custom-dialog';
+                    
+                    dialog.innerHTML = `
+                        <h3>تأكيد مسح المحادثة</h3>
+                        <p>هل أنت متأكد من رغبتك في مسح هذه المحادثة؟</p>
+                        <div class="custom-dialog-buttons">
+                            <button class="dialog-btn dialog-btn-confirm">نعم، امسح المحادثة</button>
+                            <button class="dialog-btn dialog-btn-cancel">إلغاء</button>
+                        </div>
+                    `;
+                    
+                    overlay.appendChild(dialog);
+                    document.body.appendChild(overlay);
+                    
+                    const confirmBtn = dialog.querySelector('.dialog-btn-confirm');
+                    const cancelBtn = dialog.querySelector('.dialog-btn-cancel');
+                    
+                    confirmBtn.onclick = () => {
+                        overlay.remove();
+                        resolve(true);
+                    };
+                    
+                    cancelBtn.onclick = () => {
+                        overlay.remove();
+                        resolve(false);
+                    };
+                });
+            };
+
+            const shouldClear = await showConfirmDialog();
+            
+            if (!shouldClear) return;
+
+            if (isGenerating) {
+                shouldStop = true;
+                isGenerating = false;
+                hideTypingIndicator();
+            }
+
+            // مسح المحادثة
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '';
+            conversationContext = [];
+            
+            // إضافة رسالة الترحيب
+            addMessage('مرحباً! أنا مساعدك الذكي للتطعيمات. كيف يمكنني مساعدتك اليوم؟', 'bot', true);
+            
+            // مسح المحادثة من Firebase
+            if (nationalId) {
+                try {
+                    await firebase.database().ref(`users/${nationalId}/chatHistory`).remove();
+                } catch (error) {
+                    console.error('خطأ في مسح المحادثة من السيرفر:', error);
+                }
+            }
+        }
+
+        // إضافة زر لمسح المحادثة
+        function addClearButton() {
+            const header = document.querySelector('.chat-header');
+            const clearBtn = document.createElement('button');
+            clearBtn.className = 'clear-btn';
+            clearBtn.innerHTML = '<i class="fas fa-trash"></i> مسح المحادثة';
+            clearBtn.onclick = clearChat;
+            header.appendChild(clearBtn);
+        }
+
+        // تحديث دالة إضافة الرسائل لحفظ المحادثة
+        function addMessage(text, type, withAnimation = false) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}-message ${withAnimation ? 'fade-in' : ''}`;
+
+            // البحث عن الإشارات للرسائل السابقة
+            if (type === 'bot' && conversationContext.length > 2) {
+                const lastUserMessage = conversationContext[conversationContext.length - 2].content;
+                if (text.includes('السابق') || text.includes('المذكور') || text.includes('ذلك')) {
+                    const referenceDiv = document.createElement('div');
+                    referenceDiv.className = 'message-reference';
+                    referenceDiv.textContent = `إشارة إلى: "${lastUserMessage}"`;
+                    messageDiv.appendChild(referenceDiv);
+                }
+            }
+
+            const textDiv = document.createElement('div');
+            textDiv.innerHTML = formatText(text);
+            messageDiv.appendChild(textDiv);
+            
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            // تحديث المحادثة في كلا المكانين
+            saveChatHistory();
+        }
+
+        function formatText(text) {
+            // تحويل النص المحاط بثلاث نجوم إلى نص مميز بشكل خاص
+            text = text.replace(/\*\*\*(.*?)\*\*\*/g, '<span class="highlight-special">$1</span>');
+            
+            // تحويل النص المحاط بنجمتين إلى نص عريض
+            text = text.replace(/\*\*(.*?)\*\*/g, '<span class="highlight-bold">$1</span>');
+            
+            // تحويل النص المحاط بنجمة واحدة إلى نص مائل
+            text = text.replace(/(?<![\*])\*((?:[^\*]|\*\*|\*\*\*)+?)\*(?![\*])/g, '<span class="highlight-italic">$1</span>');
+            
+            // معالجة الجداول
+            text = text.replace(/([^\n]+?)\s*\-{3}\|\-{3}\|\s*([^\n]+)/g, (match, col1, col2) => {
+                return `<table class="chat-table">
+                          <tr>
+                            <th>${col1.trim()}</th>
+                            <th>${col2.trim()}</th>
+                          </tr>
+                          <tr>
+                            <td colspan="2">
+                              <div class="table-content">
+                                ${formatTableContent(col2.trim())}
+                              </div>
+                            </td>
+                          </tr>
+                        </table>`;
+            });
+            
+            // تقسيم النص إلى أسطر
+            let lines = text.split('\n');
+            
+            // معالجة كل سطر على حدة
+            lines = lines.map(line => {
+                if (line.trim().startsWith('*')) {
+                    line = line.trim().replace(/^\*\s*/, '');
+                    return `<li class="list-item">${line}</li>`;
+                }
+                return line;
+            });
+
+            // إعادة تجميع النص
+            text = lines.join('\n');
+
+            // تغليف مجموعات العناصر المتتالية في قائمة
+            text = text.replace(/<li class="list-item">(.*?)(?=(?:<li class="list-item">|$))/gs, 
+                (match, content) => `<ul class="custom-list">${match}</ul>`);
+
+            return text;
+        }
+
+        function formatTableContent(content) {
+            // تقسيم المحتوى إ��ى نقاط إذا كان يحتوي على فواصل
+            if (content.includes('،')) {
+                const points = content.split('،');
+                return points.map(point => `<div class="table-point">• ${point.trim()}</div>`).join('');
+            }
+            return content;
+        }
+
+        // تحديث دالة حفظ المحادثة
+        async function saveChatHistory() {
+            // حفظ محلياً
+            localStorage.setItem('chatHistory', JSON.stringify(conversationContext));
+            
+            // حفظ في Firebase
+            if (nationalId) {
+                try {
+                    await firebase.database().ref(`users/${nationalId}/chatشهHistory`).set(conversationContext);
+                } catch (error) {
+                    console.error('خطأ في حفظ المحادثة على السيرفر:', error);
+                }
+            }
+        }
+
+        // تحديث دالة استرجاع المحادثة
+        async function loadChatHistory() {
+            const chatMessages = document.getElementById('chatMessages');
+            
+            // إظهار انيميشن التحميل
+            chatMessages.innerHTML = `
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">جاري التحميل ...</div>
+                </div>
+            `;
+
+            try {
+                const localConversation = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+                const userData = JSON.parse(localStorage.getItem('userData'));
+                
+                // إضافة تأخير اصطناعي للتحميل (يمكنك إزالته)
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                if (!localConversation.length && userData) {
+                    chatMessages.innerHTML = '';
+                    const welcomeMessage = `مرحباً ${userData.name}! أنا مساعدك الذكي للتطعيمات. كيف يمكنني مساعدتك اليوم؟`;
+                    conversationContext.push({
+                        role: "assistant",
+                        content: welcomeMessage
+                    });
+                    addMessage(welcomeMessage, 'bot');
+                    return;
+                }
+                
+                if (nationalId) {
+                    try {
+                        const snapshot = await firebase.database().ref(`users/${nationalId}/chatHistory`).once('value');
+                        const serverConversation = snapshot.val() || [];
+                        
+                        if (serverConversation.length > localConversation.length) {
+                            conversationContext = serverConversation;
+                            localStorage.setItem('chatHistory', JSON.stringify(serverConversation));
+                        } else if (localConversation.length > serverConversation.length) {
+                            conversationContext = localConversation;
+                            await firebase.database().ref(`users/${nationalId}/chatHistory`).set(localConversation);
+                        } else {
+                            conversationContext = localConversation;
+                        }
+                    } catch (error) {
+                        console.error('خطأ في استرجاع المحادثة من السيرفر:', error);
+                        conversationContext = localConversation;
+                    }
+                } else {
+                    conversationContext = localConversation;
+                }
+                
+                // مسح انيميشن التحميل وعرض المحادثات
+                chatMessages.innerHTML = '';
+                
+                // إضافة المحادثات مع تأثير الظهور التدريجي
+                conversationContext.forEach((msg, index) => {
+                    setTimeout(() => {
+                        addMessage(msg.content, msg.role === 'user' ? 'user' : 'bot', true);
+                    }, index * 100); // تأخير 100ms بين كل رسالة
+                });
+
+            } catch (error) {
+                console.error('خطأ في تحميل المحادثات:', error);
+                chatMessages.innerHTML = `
+                    <div class="message bot-message">
+                        عذراً، حدث خطأ في تحميل المحادثات. يرجى تحديث الصفحة.
+                    </div>
+                `;
+            }
+        }
+
+        // تحديث التنفيذ عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', async () => {
+            addClearButton();
+            await loadChatHistory(); // استرجاع المحادثة عند التحميل
+            initSpeechRecognition(); // تهيئة ميزة التعرف على الصوت
+        });
+
+        function showTypingIndicator() {
+            const indicator = document.createElement('div');
+            indicator.className = 'typing-indicator';
+            indicator.innerHTML = `
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            `;
+            document.getElementById('chatMessages').appendChild(indicator);
+        }
+
+        function hideTypingIndicator() {
+            const indicator = document.querySelector('.typing-indicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+
+        // دالة التعرف على الصوت
+        function initSpeechRecognition() {
+            const micButton = document.getElementById('micButton');
+            const userInput = document.getElementById('userInput');
+            
+            // التحقق من دعم المتصفح للتعرف على الصوت
+            if ('webkitSpeechRecognition' in window) {
+                const recognition = new webkitSpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'ar-SA'; // تعيين اللغة العربية
+
+                let isRecording = false;
+
+                micButton.addEventListener('click', () => {
+                    if (!isRecording) {
+                        // بدء التسجيل
+                        recognition.start();
+                        micButton.classList.add('recording');
+                        userInput.placeholder = "جاري الاستماع...";
+                        isRecording = true;
+                    } else {
+                        // إيقاف التسجيل
+                        recognition.stop();
+                        micButton.classList.remove('recording');
+                        userInput.placeholder = "اكتب سؤالك هنا...";
+                        isRecording = false;
+                    }
+                });
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    userInput.value = transcript;
+                    micButton.classList.remove('recording');
+                    userInput.placeholder = "اكتب سؤالك هنا...";
+                    isRecording = false;
+                    
+                    // إرسال الرسالة تلقائياً بعد التعرف على الكلام
+                    sendMessage();
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('خطأ في التعرف على الصوت:', event.error);
+                    micButton.classList.remove('recording');
+                    userInput.placeholder = "اكتب سؤالك هنا...";
+                    isRecording = false;
+                };
+
+                recognition.onend = () => {
+                    micButton.classList.remove('recording');
+                    userInput.placeholder = "اكتب سؤالك هنا...";
+                    isRecording = false;
+                };
+            } else {
+                // إخفاء زر الميكروفون إذا كان المتصفح لا يدعم التعرف على الصوت
+                micButton.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
