@@ -1,0 +1,2119 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <link rel="icon" type="image/x-icon" href="https://www2.0zz0.com/2024/11/17/11/646664920.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إشعارات الطبيب</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #2ecc71;
+            --background-color: #f0f4f8;
+            --text-primary: #2d3748;
+            --text-secondary: #4a5568;
+            --card-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --hover-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background: var(--background-color);
+            background-image: 
+                radial-gradient(at 90% 10%, rgba(52, 152, 219, 0.1) 0px, transparent 50%),
+                radial-gradient(at 10% 90%, rgba(46, 204, 113, 0.1) 0px, transparent 50%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 10px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 15px;
+            margin: 0 0 20px 0;
+            border-radius: 0 0 24px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--card-shadow);
+        }
+
+        .header h1 {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2rem;
+        }
+
+        .back-btn {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 10px 24px;
+            border-radius: 14px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+
+
+        .notification-item {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            animation: slideIn 0.3s ease-out;
+        }
+
+
+        .notification-item.unread {
+            background: linear-gradient(to right, white, #f0f7ff);
+            border-right: 5px solid var(--secondary-color);
+        }
+
+        .doctor-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 12px;
+            background: rgba(52, 152, 219, 0.05);
+            transition: var(--transition);
+        }
+
+
+
+        .doctor-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            box-shadow: 0 8px 15px rgba(52, 152, 219, 0.2);
+        }
+
+        .notification-message {
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 16px;
+            margin: 15px 0;
+            line-height: 1.8;
+            color: var(--text-primary);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            font-size: 0.95rem;
+        }
+
+        .action-btn {
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .accept-btn {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2);
+        }
+
+        .reject-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.2);
+        }
+
+
+
+        .action-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%) scale(0);
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .action-btn:active::after {
+            transform: translate(-50%, -50%) scale(2);
+        }
+
+        .status {
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 15px;
+            transition: var(--transition);
+        }
+
+        .status.accepted {
+            background: #e8f5e9;
+            color: #27ae60;
+            border: 1px solid rgba(39, 174, 96, 0.2);
+        }
+
+        .status.rejected {
+            background: #ffebee;
+            color: #c0392b;
+            border: 1px solid rgba(192, 57, 43, 0.2);
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 10px;
+        }
+
+        @keyframes modalFade {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            padding: 0;
+            border-radius: 15px;
+            width: min(320px, 90%);
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            animation: modalPopIn 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .doctor-avatar-large {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 30px;
+            background: white;
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #bdc3c7;
+            margin-bottom: 25px;
+            opacity: 0.7;
+        }
+
+        .empty-state h3 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 0;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 12px;
+                margin-bottom: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.3rem;
+            }
+
+            .back-btn {
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+
+            .notification-item {
+                padding: 15px;
+                margin-bottom: 10px;
+            }
+
+            .doctor-info {
+                padding: 8px;
+                gap: 8px;
+            }
+
+            .doctor-avatar {
+                width: 40px;
+                height: 40px;
+                border-radius: 12px;
+                font-size: 1rem;
+            }
+
+            .notification-message {
+                padding: 12px;
+                margin: 10px 0;
+                font-size: 0.9rem;
+            }
+
+            .notification-actions {
+                gap: 8px;
+            }
+
+            .action-btn {
+                padding: 10px;
+                font-size: 0.9rem;
+                border-radius: 10px;
+            }
+
+            .search-input {
+                padding: 10px 40px 10px 15px;
+                font-size: 0.9rem;
+            }
+
+            .filters {
+                gap: 6px;
+                margin-bottom: 15px;
+            }
+
+            .filter-btn {
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+
+            .doctor-info {
+                margin-bottom: 10px;
+            }
+
+            .status {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+                margin-top: 10px;
+            }
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border-radius: 12px;
+            border: 2px solid var(--primary-color);
+            background: transparent;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+        }
+
+        .filter-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+
+
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 45px 12px 20px;
+            border-radius: 15px;
+            border: 2px solid var(--primary-color);
+            background: white;
+            font-size: 1rem;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-color);
+            opacity: 0.7;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 0 3px;
+            border-radius: 3px;
+        }
+
+        .action-btn.accept-btn {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2);
+        }
+
+        .action-btn.reject-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.2);
+        }
+
+        .action-btn:active {
+            transform: scale(0.98);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .action-btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%) scale(0);
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .action-btn:active::after {
+            transform: translate(-50%, -50%) scale(2);
+        }
+
+        /* تحديث تصميم الأرار */
+        .notification-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 15px;
+            padding: 0 5px;
+        }
+
+        .action-btn {
+            padding: 12px 20px;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 1rem;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-btn.accept-btn {
+            background: linear-gradient(145deg, #2ecc71, #27ae60);
+        }
+
+        .action-btn.reject-btn {
+            background: linear-gradient(145deg, #e74c3c, #c0392b);
+        }
+
+
+        .action-btn:active {
+            transform: translateY(1px);
+        }
+
+        .action-btn i {
+            font-size: 1.1rem;
+            transition: transform 0.3s ease;
+        }
+
+
+
+        /* تح��ين للموبايل */
+        @media (max-width: 480px) {
+            .action-btn {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* إضافة تأثيرات للأزرار */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .action-btn:focus {
+            animation: pulse 0.5s ease-in-out;
+            outline: none;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+        }
+
+        .action-btn:hover::before {
+            transform: translateX(100%);
+            transition: transform 0.75s ease-in-out;
+        }
+
+        /* إضافة تنبيه التحديث */
+        .refresh-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--primary-color);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            animation: slideIn 0.3s ease, slideOut 0.3s ease 2.7s;
+            z-index: 1000;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(-100%); opacity: 0; }
+        }
+
+        /* أنماط الإشعارات المنبثقة */
+        .notification-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 12px 24px;
+            border-radius: 12px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            animation: slideIn 0.3s ease, slideOut 0.3s ease 2.7s;
+            z-index: 1000;
+        }
+
+        .notification-toast.success {
+            background: linear-gradient(145deg, #2ecc71, #27ae60);
+        }
+
+        .notification-toast.error {
+            background: linear-gradient(145deg, #e74c3c, #c0392b);
+        }
+
+        .notification-toast.info {
+            background: linear-gradient(145deg, #3498db, #2980b9);
+        }
+
+        /* أنماط نافذة معلومات الطبيب المحسنة */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            padding: 0;
+            border-radius: clamp(20px, 4vw, 30px);
+            width: min(500px, 95%);
+            position: relative;
+            box-shadow: 0 35px 70px -12px rgba(0, 0, 0, 0.35);
+            overflow: hidden;
+            animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            margin: auto;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .modal-header {
+            background: linear-gradient(165deg, var(--primary-color), var(--secondary-color));
+            padding: clamp(30px, 5vw, 40px) clamp(15px, 3vw, 25px);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: clamp(12px, 2vw, 15px);
+            left: clamp(12px, 2vw, 15px);
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            width: clamp(32px, 5vw, 36px);
+            height: clamp(32px, 5vw, 36px);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(1rem, 1.5vw, 1.1rem);
+            transition: all 0.3s ease;
+            z-index: 3;
+        }
+
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        .doctor-avatar-large {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 3.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border: 8px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .doctor-avatar-large::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(255, 255, 255, 0.1),
+                transparent
+            );
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+
+
+        .doctor-name-title {
+            color: white;
+            margin: 25px 0 8px;
+            font-size: 2rem;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .doctor-specialty-title {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.2rem;
+            font-weight: 500;
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            display: inline-block;
+            backdrop-filter: blur(5px);
+        }
+
+        .doctor-info-content {
+            padding: clamp(20px, 4vw, 25px);
+            background: white;
+            position: relative;
+            z-index: 1;
+        }
+
+        .info-section {
+            margin-bottom: 35px;
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .info-section:nth-child(1) { animation-delay: 0.2s; }
+        .info-section:nth-child(2) { animation-delay: 0.4s; }
+        .info-section:nth-child(3) { animation-delay: 0.6s; }
+
+        .info-title {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-right: 10px;
+        }
+
+        .info-title i {
+            color: white;
+            background: var(--secondary-color);
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .info-card {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--secondary-color);
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+ 
+
+
+
+        .info-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .contact-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .contact-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .contact-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px;
+            border-radius: 12px;
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .contact-btn.email {
+            background: linear-gradient(135deg, #2980b9, #3498db);
+        }
+
+        .contact-btn.phone {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+        }
+
+
+
+        .contact-btn i {
+            font-size: 1.2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .modal-content {
+                width: 100%;
+                border-radius: 30px;
+                margin: 10px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* تنسيق شريط التمرير للنافذة */
+        .modal::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .modal::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        .modal::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        /* تحسينات للشاشات المختلفة */
+        @media (max-height: 600px) {
+            .modal {
+                align-items: flex-start;
+            }
+            
+            .modal-content {
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .modal-content {
+                margin-top: 30px;
+                margin-bottom: 30px;
+            }
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 10px;
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            padding: 0;
+            border-radius: 15px;
+            width: min(320px, 90%);
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            animation: modalPopIn 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            background: linear-gradient(165deg, var(--primary-color), var(--secondary-color));
+            padding: 20px 15px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            z-index: 3;
+        }
+
+        .doctor-avatar-large {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .doctor-name-title {
+            color: white;
+            margin: 10px 0 5px;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .doctor-specialty-title {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 3px 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .doctor-info-content {
+            padding: 15px;
+            background: white;
+            overflow-y: auto;
+        }
+
+        .info-section {
+            margin-bottom: 15px;
+        }
+
+        .info-title {
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+            gap: 6px;
+        }
+
+        .info-title i {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
+        .info-card {
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+
+        .info-label {
+            font-size: 0.8rem;
+            margin-bottom: 3px;
+        }
+
+        .info-value {
+            font-size: 0.9rem;
+        }
+
+        .contact-buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        .contact-btn {
+            padding: 10px;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .contact-btn i {
+            font-size: 0.9rem;
+        }
+
+        /* تحسينات للشاشات المختلفة */
+        @media (min-width: 768px) {
+            .modal-content {
+                margin-top: 20px;
+            }
+        }
+
+        @media (max-width: 320px) {
+            .modal-content {
+                width: 95%;
+            }
+        }
+
+        /* تحسين حركة الظهور */
+        @keyframes modalPopIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* تحسين شريط التمرير */
+        .doctor-info-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .doctor-info-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .doctor-info-content::-webkit-scrollbar-thumb {
+            background: #ddd;
+            border-radius: 4px;
+        }
+
+        /* تحسينات للشاشات المختلفة */
+        @media (max-height: 600px) {
+            .modal-content {
+                max-height: 95vh;
+            }
+        }
+
+        @media (max-width: 320px) {
+            .modal-content {
+                width: 95%;
+            }
+        }
+
+        .contact-btn.chat {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+
+
+        .contact-btn.chat:active {
+            transform: translateY(0);
+        }
+
+        .contact-btn.chat i {
+            font-size: 1.1rem;
+        }
+        .notification-item {
+            border-right: 4px solid transparent;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .notification-item.block {
+            border-right-color: var(--accent-color);
+        }
+
+        .notification-item.request {
+            border-right-color: var(--secondary-color);
+        }
+
+        .notification-item.response {
+            border-right-color: var(--success-color);
+        }
+
+        .notification-time {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 15px;
+            color: white;
+        }
+
+        .notification-item.block .notification-icon {
+            background: var(--accent-color);
+        }
+
+        .notification-item.request .notification-icon {
+            background: var(--secondary-color);
+        }
+
+        .notification-item.response .notification-icon {
+            background: var(--success-color);
+        }
+
+        .user-info {
+            background: rgba(52, 152, 219, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .view-details-btn, .chat-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            margin: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .view-details-btn {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .chat-btn {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2em;
+        }
+
+        .user-info-details {
+            text-align: center;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn.chat {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .notification-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 15px 25px;
+            border-radius: 12px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out, fadeOut 0.3s ease-in 2.7s forwards;
+            font-weight: 600;
+        }
+
+        .notification-toast.success {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+        }
+
+        .notification-toast.error {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .status {
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .status.success {
+            background: #e8f5e9;
+            color: #27ae60;
+        }
+
+        .status.error {
+            background: #ffebee;
+            color: #c0392b;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(52, 152, 219, 0.05);
+            border-radius: 12px;
+            margin: 10px 0;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .user-data h4 {
+            font-size: 1rem;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+
+        .user-data p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .notification-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .notification-actions .action-btn {
+            padding: 10px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn.chat {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            border: none;
+        }
+
+        .action-btn:not(.chat) {
+            background: var(--background-color);
+            color: var(--text-primary);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .status.success {
+            background: #e8f5e9;
+            color: #27ae60;
+        }
+
+        .status.error {
+            background: #ffebee;
+            color: #c0392b;
+        }
+
+        .status.pending {
+            background: #fff3e0;
+            color: #f39c12;
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            background: var(--primary-color);
+        }
+
+        .notification-icon.success { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+        .notification-icon.error { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .notification-icon.pending { background: linear-gradient(135deg, #f39c12, #f1c40f); }
+
+        .notification-time {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .notification-body {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .notification-message {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+        }
+
+        .user-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 16px;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .user-details {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .user-details span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .view-profile {
+            color: var(--primary-color);
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+
+
+
+        .notification-status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .notification-status.success {
+            background: #e8f5e9;
+            color: #27ae60;
+        }
+
+        .notification-status.error {
+            background: #ffebee;
+            color: #c0392b;
+        }
+
+        .notification-status.pending {
+            background: #fff3e0;
+            color: #f39c12;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .notification-item.unread {
+            border-right: 4px solid var(--secondary-color);
+            background: linear-gradient(to right, white, #f0f7ff);
+        }
+
+        .notification-item.unread .notification-body {
+            background: rgba(52, 152, 219, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>الإشعارات</h1>
+            <button onclick="location.href='medical-center.html'" class="back-btn">
+                <i class="fas fa-arrow-right"></i>
+                رجوع
+            </button>
+        </div>
+
+        <div class="filters">
+            <button class="filter-btn active" data-filter="all">الكل</button>
+            <button class="filter-btn" data-filter="accepted">الموافقة</button>
+            <button class="filter-btn" data-filter="rejected">الرفض</button>
+            <button class="filter-btn" data-filter="other">آخر</button>
+        </div>
+
+        <div id="notificationsContainer"></div>
+    </div>
+
+    <script>
+        // تكوين Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYMRiJQs8vsapzX1bMHTWjrEb-N2ePIPo",
+            authDomain: "mhd-vaxtracker.firebaseapp.com",
+            databaseURL: "https://mhd-vaxtracker-default-rtdb.firebaseio.com",
+            projectId: "mhd-vaxtracker",
+            storageBucket: "mhd-vaxtracker.firebasestorage.app",
+            messagingSenderId: "104907445114",
+            appId: "1:104907445114:web:6110c5cf4e2607ed677cc3",
+            measurementId: "G-RF9SYJ2KCH"
+        };
+
+        // تهيئة Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        // دالة تحميل الإشعارات
+        async function loadDoctorNotifications() {
+            try {
+                const doctorData = JSON.parse(localStorage.getItem('doctorData'));
+                if (!doctorData || !doctorData.nationalId) {
+                    throw new Error('لم يتم العثور على بيانات الطبيب');
+                }
+
+                const notificationsRef = firebase.database()
+                    .ref(`doctors/${doctorData.nationalId}/notifications`)
+                    .orderByChild('timestamp')
+                    .limitToLast(50); // تحديد عدد الإشعارات المعروضة
+
+                const snapshot = await notificationsRef.once('value');
+                const notifications = [];
+                
+                // تجميع الإشعارات في مصفوفة
+                snapshot.forEach(childSnapshot => {
+                    notifications.push({
+                        id: childSnapshot.key,
+                        ...childSnapshot.val()
+                    });
+                });
+
+                // ترتيب الإشعارات من الأحدث للأقدم
+                notifications.sort((a, b) => b.timestamp - a.timestamp);
+                
+                // عرض الإشعارات
+                await displayNotifications(notifications);
+                
+            } catch (error) {
+                console.error('Error loading notifications:', error);
+                showNotification('حدث خطأ في تحميل الإشعارات', 'error');
+            }
+        }
+
+        // دالة عرض الإشعارات
+        async function displayNotifications(notifications) {
+            const container = document.getElementById('notificationsContainer');
+            container.innerHTML = '';
+
+            if (!notifications || notifications.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-bell-slash"></i>
+                        <h3>لا توجد إشعارات</h3>
+                        <p>ستظهر هنا الإشعارات الجديدة عندما تتلقاها</p>
+                    </div>
+                `;
+                return;
+            }
+
+            for (const notification of notifications) {
+                try {
+                    const userDetails = notification.userId ? await getUserDetails(notification.userId) : {};
+                    
+                    const element = document.createElement('div');
+                    element.className = `notification-item ${notification.type || ''} ${!notification.seen ? 'unread' : ''}`;
+                    
+                    element.innerHTML = `
+                        <div class="notification-content">
+                            <div class="notification-header">
+                                <div class="notification-icon ${getStatusClass(notification.type)}">
+                                    <i class="fas ${getNotificationIcon(notification.type)}"></i>
+                                </div>
+                                <div class="notification-time">
+                                    <i class="far fa-clock"></i>
+                                    ${formatDate(notification.timestamp)}
+                                </div>
+                            </div>
+                            
+                            <div class="notification-body">
+                                <div class="notification-message">${notification.message}</div>
+                                
+                                ${userDetails.name ? `
+                                    <div class="user-card" onclick="showUserModal('${notification.userId}')">
+                                        <div class="user-avatar">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <div class="user-info">
+                                            <div class="user-name">${userDetails.name}</div>
+                                            <div class="user-details">
+                                                <span><i class="fas fa-id-card"></i> ${notification.userId}</span>
+                                                ${userDetails.phone ? `
+                                                    <span><i class="fas fa-phone"></i> ${userDetails.phone}</span>
+                                                ` : ''}
+                                            </div>
+                                        </div>
+                                        <div class="view-profile">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                
+                                <div class="notification-status ${getStatusClass(notification.type)}">
+                                    ${getStatusText(notification.type)}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    container.appendChild(element);
+
+                    // تحديث حالة الإشعار كمقروء بعد عرضه
+                    if (!notification.seen) {
+                        markNotificationAsSeen(notification.id);
+                    }
+                } catch (error) {
+                    console.error('Error displaying notification:', error);
+                }
+            }
+        }
+
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            return new Intl.DateTimeFormat('ar-EG', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric'
+            }).format(date);
+        }
+
+        // تصفية الإشعارات
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const filter = btn.dataset.filter;
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                filterNotifications(filter);
+            });
+        });
+
+        function filterNotifications(filter) {
+            const items = document.querySelectorAll('.notification-item');
+            items.forEach(item => {
+                if (filter === 'all' || item.classList.contains(filter)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // تحميل الإشعارات عند فتح الصفحة
+        window.onload = loadDoctorNotifications;
+
+        // دالة جلب بيانات المستخدم
+        async function getUserDetails(userId) {
+            try {
+                const userRef = firebase.database().ref(`users/${userId}`);
+                const snapshot = await userRef.once('value');
+                return snapshot.val() || {};
+            } catch (error) {
+                console.error('Error fetching user details:', error);
+                return {};
+            }
+        }
+
+        // دالة عرض تفاصيل المريض
+        function viewUserDetails(userId) {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>تفاصيل المريض</h3>
+                        <button onclick="this.closest('.modal').remove()" class="close-btn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="loader"></div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // جلب وعرض بيانات المريض
+            getUserDetails(userId).then(user => {
+                const modalBody = modal.querySelector('.modal-body');
+                modalBody.innerHTML = `
+                    <div class="user-details">
+                        <div class="user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="user-info-details">
+                            <h4>${user.name || 'غير معروف'}</h4>
+                            <p><i class="fas fa-phone"></i> ${user.phone || 'لا يوجد'}</p>
+                            <p><i class="fas fa-calendar"></i> ${user.birthDate || 'غير محدد'}</p>
+                            <p><i class="fas fa-venus-mars"></i> ${user.gender || 'غير محدد'}</p>
+                        </div>
+                        <div class="user-actions">
+                            <button onclick="startChat('${userId}')" class="action-btn chat">
+                                <i class="fas fa-comments"></i>
+                                بدء محادثة
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // دالة بدء المحادثة
+        async function startChat(userId) {
+            try {
+                const doctorData = JSON.parse(localStorage.getItem('doctorData'));
+                if (!doctorData || !doctorData.nationalId) {
+                    throw new Error('لم يتم العثور على بيانات الطبيب');
+                }
+
+                // إنشاء معرف فريد للمحادثة
+                const chatId = `${userId}_${doctorData.nationalId}`;
+                
+                // إنشاء المحادثة في Firebase
+                const chatRef = firebase.database().ref(`chats/${chatId}`);
+                const chatSnapshot = await chatRef.once('value');
+                
+                if (!chatSnapshot.exists()) {
+                    await chatRef.set({
+                        createdAt: firebase.database.ServerValue.TIMESTAMP,
+                        participants: {
+                            [doctorData.nationalId]: true,
+                            [userId]: true
+                        },
+                        lastMessage: {
+                            text: 'بدء محادثة جديدة',
+                            timestamp: firebase.database.ServerValue.TIMESTAMP,
+                            senderId: doctorData.nationalId
+                        }
+                    });
+                }
+
+                // توجيه الطبيب إلى صفحة المحادثة
+                window.location.href = `doctor-chat.html?chatId=${chatId}`;
+
+            } catch (error) {
+                console.error('Error starting chat:', error);
+                showNotification('حدث خطأ في بدء المحادثة', 'error');
+            }
+        }
+
+        function initializeNotificationsListener() {
+            const doctorData = JSON.parse(localStorage.getItem('doctorData'));
+            if (!doctorData || !doctorData.nationalId) return;
+
+            const notificationsRef = firebase.database()
+                .ref(`doctors/${doctorData.nationalId}/notifications`);
+
+            // الاستماع للإشعارات الجديدة
+            notificationsRef.on('child_added', (snapshot) => {
+                const notification = snapshot.val();
+                if (!notification.seen) {
+                    // إضافة الإشعار الجديد للواجهة
+                    addNewNotification(notification, snapshot.key);
+                    // عرض إشعار منبثق
+                    showToast(notification);
+                }
+            });
+        }
+
+        function addNewNotification(notification, notificationId) {
+            const container = document.getElementById('notificationsContainer');
+            const element = document.createElement('div');
+            element.className = `notification-item ${getNotificationType(notification.type)}`;
+            element.style.animation = 'slideIn 0.3s ease-out';
+            
+            let icon = 'fa-bell';
+            let statusClass = '';
+            let statusText = '';
+            
+            // تحديد الأيقونة والحالة بناءً على نوع الإشعار
+            if (notification.type === 'accepted') {
+                icon = 'fa-check-circle';
+                statusClass = 'success';
+                statusText = 'تم القبول';
+            } else if (notification.type === 'rejected') {
+                icon = 'fa-times-circle';
+                statusClass = 'error';
+                statusText = 'تم الرفض';
+            }
+
+            element.innerHTML = `
+                <div class="notification-content">
+                    <div class="notification-icon">
+                        <i class="fas ${icon}"></i>
+                    </div>
+                    <div class="notification-details">
+                        <div class="notification-message">${notification.message}</div>
+                        <div class="status ${statusClass}">${statusText}</div>
+                        <div class="notification-time">${formatDate(notification.timestamp)}</div>
+                    </div>
+                </div>
+            `;
+
+            // إضافة الإشعار في بداية القائمة
+            if (container.firstChild) {
+                container.insertBefore(element, container.firstChild);
+            } else {
+                container.appendChild(element);
+            }
+
+            // تحديث حالة الإشعار كمقروء
+            markNotificationAsSeen(notificationId);
+        }
+
+        function showToast(notification) {
+            const toast = document.createElement('div');
+            toast.className = `notification-toast ${notification.type === 'accepted' ? 'success' : 'error'}`;
+            
+            toast.innerHTML = `
+                <i class="fas ${notification.type === 'accepted' ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                <span>${notification.message}</span>
+            `;
+
+            document.body.appendChild(toast);
+
+            // إزالة الإشعار بعد 3 ثواني
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        function getNotificationType(type) {
+            switch(type) {
+                case 'accepted':
+                    return 'response success';
+                case 'rejected':
+                    return 'response error';
+                default:
+                    return '';
+            }
+        }
+
+        // دالة تحديث حالة الإشعار
+        async function markNotificationAsSeen(notificationId) {
+            try {
+                const doctorData = JSON.parse(localStorage.getItem('doctorData'));
+                if (!doctorData || !doctorData.nationalId) return;
+
+                await firebase.database()
+                    .ref(`doctors/${doctorData.nationalId}/notifications/${notificationId}`)
+                    .update({ seen: true });
+            } catch (error) {
+                console.error('Error marking notification as seen:', error);
+            }
+        }
+
+        // إضافة أنماط CSS جديدة للإشعارات غير المقروءة
+        const additionalStyles = `
+            .notification-item.unread {
+                border-right: 4px solid var(--secondary-color);
+                background: linear-gradient(to right, white, #f0f7ff);
+            }
+
+            .notification-item.unread .notification-body {
+                background: rgba(52, 152, 219, 0.05);
+            }
+        `;
+
+        // إضافة الأنماط الجديدة
+        const styleSheet = document.createElement("style");
+        styleSheet.textContent = additionalStyles;
+        document.head.appendChild(styleSheet);
+
+        // تحديث دالة window.onload
+        window.onload = function() {
+            loadDoctorNotifications();
+            initializeNotificationsListener();
+        };
+
+        // دالة عرض نافذة بيانات المستخدم
+        async function showUserModal(userId) {
+            try {
+                const userDetails = await getUserDetails(userId);
+                
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button class="close-modal" onclick="this.closest('.modal').remove()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <div class="user-avatar-large">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h2 class="user-name-title">${userDetails.name || 'غير محدد'}</h2>
+                        </div>
+                        
+                        <div class="user-info-content">
+                            <div class="info-section">
+                                <div class="info-title">
+                                    <i class="fas fa-info-circle"></i>
+                                    المعلومات الشخصية
+                                </div>
+                                <div class="info-card">
+                                    <div class="info-label">الرقم القومي</div>
+                                    <div class="info-value">${userId}</div>
+                                </div>
+                                <div class="info-card">
+                                    <div class="info-label">تاريخ الميلاد</div>
+                                    <div class="info-value">${userDetails.birthdate || 'غير محدد'}</div>
+                                </div>
+
+                            </div>
+
+                            <div class="info-section">
+                                <div class="info-title">
+                                    <i class="fas fa-phone"></i>
+                                    معلومات الاتصال
+                                </div>
+                                <div class="info-card">
+                                    <div class="info-label">رقم الهاتف</div>
+                                    <div class="info-value">${userDetails.phone || 'غير محدد'}</div>
+                                </div>
+                            </div>
+
+                            <div class="info-section">
+                                <div class="info-title">
+                                    <i class="fas fa-comments"></i>
+                                    التواصل المباشر
+                                </div>
+                                <div class="contact-buttons">
+                                    <button class="contact-btn chat" onclick="startChat('${userId}')">
+                                        <i class="fas fa-comment-dots"></i>
+                                        بدء محادثة
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+
+                // إضافة مستمع لإغلاق النافذة عند النقر خارجها
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.remove();
+                    }
+                });
+            } catch (error) {
+                console.error('Error showing user modal:', error);
+                showNotification('حدث خطأ في عرض بيانات المستخدم', 'error');
+            }
+        }
+
+        // دالة مساعدة للحصول على أيقونة الإشعار
+        function getNotificationIcon(type) {
+            switch(type) {
+                case 'accepted': return 'fa-check-circle';
+                case 'rejected': return 'fa-times-circle';
+                case 'request': return 'fa-envelope';
+                default: return 'fa-bell';
+            }
+        }
+
+        // دالة مساعدة للحصول على صنف الحالة
+        function getStatusClass(type) {
+            switch(type) {
+                case 'accepted': return 'success';
+                case 'rejected': return 'error';
+                case 'request': return 'pending';
+                default: return '';
+            }
+        }
+
+        // دالة مساعدة للحصول على نص الحالة
+        function getStatusText(type) {
+            switch(type) {
+                case 'accepted': return 'تم القبول';
+                case 'rejected': return 'تم الرفض';
+                case 'request': return 'طلب جديد';
+                default: return '';
+            }
+        }
+    </script>
+</body>
+</html> 

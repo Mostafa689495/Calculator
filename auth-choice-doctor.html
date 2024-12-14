@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <link rel="icon" type="image/x-icon" href="https://www2.0zz0.com/2024/11/17/11/646664920.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام التطعيمات</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #0f172a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.4) 0, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.4) 0, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.4) 0, transparent 40%);
+            background-size: 200% 200%;
+            animation: moveBackground 20s ease infinite;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 1200px;
+            background: var(--glass-bg);
+            padding: 4rem;
+            border-radius: 40px;
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.15),
+                0 0 0 1px rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-container::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--gradient);
+            opacity: 0.1;
+            z-index: 0;
+        }
+
+        .title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+
+        .subtitle {
+            color: #4b5563;
+            margin-bottom: 3rem;
+            font-size: 1.3rem;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .auth-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .auth-option {
+            padding: 3rem 2.5rem;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 25px;
+            text-align: center;
+            text-decoration: none;
+            color: #1e293b;
+            box-shadow: var(--card-shadow);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-option::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--gradient);
+            opacity: 0;
+            transition: 0.4s;
+            z-index: -1;
+        }
+
+        .auth-option:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: transparent;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .auth-option:hover::before {
+            opacity: 0.1;
+        }
+
+        .auth-option i {
+            font-size: 2.8rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+        }
+
+        .auth-option h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+
+        .auth-option p {
+            color: #64748b;
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+
+        @keyframes moveBackground {
+            0%, 100% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+        }
+
+        .loading {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.98);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: 0.3s ease;
+        }
+
+        .loading.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(59, 130, 246, 0.1);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0.8rem;
+            }
+
+            .auth-container {
+                padding: 3rem 2rem;
+                border-radius: 30px;
+            }
+
+            .auth-options {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .auth-option {
+                padding: 2rem;
+            }
+
+            .title {
+                font-size: 2.5rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+                margin-bottom: 2rem;
+            }
+
+            .auth-option i {
+                font-size: 2rem;
+            }
+
+            .auth-option h3 {
+                font-size: 1.2rem;
+            }
+
+            .auth-option p {
+                font-size: 0.9rem;
+                line-height: 1.4;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .title {
+                font-size: 1.5rem;
+            }
+
+            .auth-container {
+                padding: 1.5rem 1rem;
+                width: 1000;
+                
+            }
+
+            .auth-option {
+                padding: 1.2rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading">
+        <div class="loading-spinner"></div>
+    </div>
+    
+    <div class="auth-container">
+        <h1 class="title">مرحباً بك في نظام التطعيمات</h1>
+        <p class="subtitle">اختر طريقة الدخول المناسبة لك</p>
+        
+        <div class="auth-options">
+            <a href="doctor-login.html" class="auth-option">
+                <i class="fas fa-sign-in-alt"></i>
+                <h3>تسجيل الدخول</h3>
+                <p>لديك حساب بالفعل؟ سجل دخولك الآن للوصول إلى حسابك</p>
+            </a>
+            
+            <a href="doctor-sign.html" class="auth-option">
+                <i class="fas fa-user-plus"></i>
+                <h3>إنشاء حساب جديد</h3>
+                <p>جديد في النظام؟ أنشئ حسابك الآن وابدأ رحلتك معنا</p>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            createParticles();
+            const userData = localStorage.getItem('userData');
+            if (userData) {
+                window.location.href = './midical-center.html';  
+            }
+        }
+
+        window.addEventListener('load', () => {
+            document.querySelector('.loading').classList.add('hide');
+        });
+
+        document.querySelectorAll('.auth-option').forEach(link => {
+            link.addEventListener('click', () => {
+                document.querySelector('.loading').classList.remove('hide');
+            });
+        });
+        window.onload = function() {
+            const doctorData = localStorage.getItem('doctorData');
+            if (doctorData) {
+                window.location.href = 'medical-center.html';
+            }
+        }
+    </script>
+</body>
+</html> 
